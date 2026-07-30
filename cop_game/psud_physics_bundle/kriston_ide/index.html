@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kriston IDE – Physics Scroll</title>
+  <style>
+    body { margin: 0; background: #0a0a0a; color: #fff; font-family: monospace; }
+    h1 { text-align: center; padding: 10px; }
+    textarea {
+      width: 90%; height: 300px; margin: 10px auto; display: block;
+      background: #111; color: #0ff; border: 1px solid #333;
+      font-size: 16px; padding: 10px; border-radius: 6px;
+    }
+    select, button {
+      display: block; margin: 10px auto; font-size: 16px;
+      padding: 10px; border-radius: 6px; background: #0ff; color: #000;
+      border: none;
+    }
+    #log {
+      width: 90%; margin: 10px auto; background: #111; padding: 10px;
+      border: 1px solid #444; min-height: 50px; color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kriston IDE – Scroll Editor</h1>
+  <select id="commandPicker">
+    <option value="">-- Insert Command --</option>
+    <option value='spawn "orb" at 4 2'>spawn "orb" at 4 2</option>
+    <option value='physics "orb" gravity on'>physics "orb" gravity on</option>
+    <option value='physics "orb" bounce 0.8'>physics "orb" bounce 0.8</option>
+  </select>
+  <textarea id="scroll">spawn "orb" at 4 2
+physics "orb" gravity on
+physics "orb" bounce 0.8</textarea>
+  <button id="run">▶ Run Scroll</button>
+  <div id="log">Output will appear here…</div>
+  <script>
+    const runBtn = document.getElementById("run");
+    const editor = document.getElementById("scroll");
+    const log = document.getElementById("log");
+    const picker = document.getElementById("commandPicker");
+
+    picker.addEventListener("change", () => {
+      const command = picker.value;
+      if (command) {
+        editor.value += "\n" + command;
+        picker.selectedIndex = 0;
+      }
+    });
+
+    runBtn.addEventListener("click", () => {
+      const scroll = editor.value;
+      log.innerHTML = "Running scroll...<br>";
+      localStorage.setItem("psud_scroll_run", scroll);
+    });
+  </script>
+</body>
+</html>

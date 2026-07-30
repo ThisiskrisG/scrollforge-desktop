@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kriston IDE – Triggers</title>
+  <style>
+    body { margin: 0; background: #0a0a0a; color: #fff; font-family: monospace; }
+    h1 { text-align: center; padding: 10px; }
+    textarea {
+      width: 90%; height: 300px; margin: 10px auto; display: block;
+      background: #111; color: #0ff; border: 1px solid #333;
+      font-size: 16px; padding: 10px; border-radius: 6px;
+    }
+    button {
+      display: block; margin: 10px auto; font-size: 16px;
+      padding: 10px; border-radius: 6px; background: #0ff; color: #000;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kriston IDE – Triggers</h1>
+  <textarea id="scroll">spawn "orb" at 5 2
+physics "orb" gravity on
+physics "orb" bounce 0.6
+velocity "orb" 0 0
+
+spawn "spike1" at 5 12 type "spike"
+spawn "enemy1" at 8 12 type "enemy"
+
+on_collide "orb" with "spike" change_color "orb" "#ff0"
+on_collide "orb" with "enemy" play_sound "hit.wav"
+
+after 2 seconds spawn "clone" at 6 2</textarea>
+  <button id="run">▶ Run Scroll</button>
+  <script>
+    document.getElementById("run").onclick = () => {
+      localStorage.setItem("psud_scroll_run", document.getElementById("scroll").value);
+    };
+  </script>
+</body>
+</html>

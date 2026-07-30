@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Car Game</title>
+  <style>
+    body { background: #000; color: #0f0; font-family: monospace; margin: 0; }
+    #gameArea { height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .car { width: 100px; height: 50px; background: lime; transition: transform 0.3s ease; }
+    .boost { animation: boostEffect 0.5s ease infinite alternate; }
+    @keyframes boostEffect {
+      from { transform: scale(1); }
+      to { transform: scale(1.2); }
+    }
+  </style>
+</head>
+<body>
+  <div id="gameArea"><div class="car" id="car"></div></div>
+  <script>
+    window.addEventListener("message", (event) => {
+      const command = event.data;
+      if (typeof command === "string" && command.includes("ripple")) {
+        const match = command.match(/ripple\s+\"(.+?)\"/);
+        if (match && match[1] === "boost_zone") {
+          document.getElementById("car").classList.add("boost");
+          setTimeout(() => {
+            document.getElementById("car").classList.remove("boost");
+          }, 3000);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

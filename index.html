@@ -1,0 +1,15 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Scrollforge IDE</title>
+  <style>body{margin:0;font-family:sans-serif;}</style>
+</head>
+<body>
+  <h1>Scrollforge IDE</h1>
+  <button onclick="window.electronAPI?.checkForUpdates()">Check for Updates</button>
+  <div id="update-status" style="display:none;background:#333;color:white;padding:10px;">
+    Updating... <progress id="progress" value="0" max="100"></progress> <span id="percent">0%</span>
+  </div>
+  <script src="vault.js"></script>
+</body>
+</html>

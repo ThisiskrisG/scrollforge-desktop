@@ -1,0 +1,112 @@
+
+<html>
+<head>
+  <title>Creator Mode - Integrated Theme Switcher</title>
+  <style>
+    :root {
+      --bg-color: #111;
+      --text-color: #eee;
+      --accent-color: #0ff;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #222;
+      padding: 10px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .theme-selector select {
+      background: #333;
+      color: #fff;
+      border: 1px solid var(--accent-color);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    h1 {
+      color: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div><strong>🎮 Creator Mode</strong></div>
+    <div class="theme-selector">
+      <label for="themeSelector">🎨 Theme:</label>
+      <select id="themeSelector" onchange="setTheme(this.value)">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+        <option value="neon">Neon</option>
+        <option value="ocean">Ocean</option>
+        <option value="retro">Retro</option>
+        <option value="future">FutureTech</option>
+      </select>
+    </div>
+  </div>
+
+  <main>
+    <h1>Welcome to the VR Creator Dashboard</h1>
+    <p>Use the theme switcher above to personalize your experience.</p>
+  </main>
+
+  <script>
+    const themes = {
+      dark: {
+        "--bg-color": "#111",
+        "--text-color": "#eee",
+        "--accent-color": "#0ff"
+      },
+      light: {
+        "--bg-color": "#f5f5f5",
+        "--text-color": "#222",
+        "--accent-color": "#008cff"
+      },
+      neon: {
+        "--bg-color": "#000000",
+        "--text-color": "#ffffff",
+        "--accent-color": "#00ff00"
+      },
+      ocean: {
+        "--bg-color": "#001f3f",
+        "--text-color": "#ffffff",
+        "--accent-color": "#00c8ff"
+      },
+      retro: {
+        "--bg-color": "#2b1d0e",
+        "--text-color": "#ffcc99",
+        "--accent-color": "#ff6600"
+      },
+      future: {
+        "--bg-color": "#0d0d0d",
+        "--text-color": "#cccccc",
+        "--accent-color": "#ff00ff"
+      }
+    };
+
+    function setTheme(theme) {
+      const root = document.documentElement;
+      const selected = themes[theme];
+      for (let key in selected) {
+        root.style.setProperty(key, selected[key]);
+      }
+      localStorage.setItem("creatorTheme", theme);
+    }
+
+    const savedTheme = localStorage.getItem("creatorTheme") || "dark";
+    document.getElementById("themeSelector").value = savedTheme;
+    setTheme(savedTheme);
+  </script>
+</body>
+</html>

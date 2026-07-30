@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Social Media App</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/social_media.js') }}" defer></script>
+
+    <!-- Security Policy -->
+    <meta http-equiv="content-security-policy" content="same-origin require-corp">
+</head>
+<body>
+
+<header class="container mt-4">
+    <h1>Your Social Media</h1>
+</header>
+
+<!-- Navigation Bar -->
+<nav class="container">
+    <a href="#" class="nav-link" data-section="home">Home</a> |
+    <a href="#" class="nav-link" data-section="profile">Profile</a> |
+    <a href="#" class="nav-link" data-section="post-feed">Post Feed</a> |
+    <a href="#" class="nav-link" data-section="friends">Friends</a> |
+    <a href="#" class="nav-link" data-section="messages">Messages</a> |
+    <a href="#" class="nav-link" data-section="settings">Settings</a> |
+    <a href="#" class="nav-link" data-section="browse">Browse</a>
+</nav>
+
+<main class="container mt-5">
+
+    <!-- Home Section -->
+    <div class="section home" style="display: none;">
+        <h2>Home Section Content</h2>
+        <div class="post-container"></div>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="section profile" style="display: none;">
+        <h2>Your Profile</h2>
+
+      <form onsubmit="updateProfile(event)">
+    <label for="newUsername">Update Username:</label>
+    <input type="text" id="newUsername" name="newUsername" class="form-control" required>
+
+    <label for="newBioDescription" class="mt-3">Update Bio Description:</label>
+    <input type="text" id="newBioDescription" name="newBioDescription" class="form-control" required>
+
+    <label for="newUserAge" class="mt-3">Update Age:</label>
+    <input type="number" id="newUserAge" name="newUserAge" class="form-control" required>
+
+    <label for="profilePictureUpload" class="mt-3">Upload Profile Picture:</label>
+    <input type="file" accept="image/*" id="profilePictureUpload" name="profilePictureUpload" class="form-control-file" onchange="previewProfilePicture(event)">
+
+    <button type="submit" class="btn btn-primary mt-3">Update Profile</button>
+</form>
+
+<!-- Preview Section -->
+<div id="previewSection" style="display: none; margin-top: 20px;">
+    <h4>Preview</h4>
+    <div id="profilePicturePreview">
+        <img id="previewImage" alt="Profile Picture" style="max-width: 200px; max-height: 200px;">
+    </div>
+    <p id="bioDescriptionPreview"></p>
+</div>
+
+
+    <!-- Post Feed Section -->
+    <div class="section post-feed" style="display: none;">
+        <h2>Post Feed Section</h2>
+        <h3>Create a New Post</h3>
+
+        <form id="postForm" onsubmit="createPost(event)">
+            <label for="postTitle">Title:</label>
+            <input type="text" id="postTitle" name="postTitle" class="form-control" required>
+
+            <label for="postContent" class="mt-3">Content:</label>
+            <textarea id="postContent" name="postContent" rows="4" class="form-control" required></textarea>
+
+            <button type="submit" class="btn btn-success mt-3">Post</button>
+        </form>
+    </div>
+
+    <!-- Friends Section -->
+    <div class="section friends" style="display: none;">
+        <h2>Your Friends</h2>
+        <ul class="list-group friends-list">
+            <!-- Friends list will be dynamically populated here -->
+        </ul>
+    </div>
+
+    <!-- Browse Section -->
+    <div class="section browse" style="display: none;">
+        <h1>Browse Section</h1>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="section messages" style="display: none;">
+        <h2>Your Messages</h2>
+        <div class="message-container">
+            <!-- Individual messages will be appended here -->
+        </div>
+
+        <form onsubmit="sendMessage(event)" class="mt-3">
+            <input type="text" id="receiver" class="form-control mb-2" placeholder="Recipient Username" required>
+            <input type="text" id="message" class="form-control mb-2" placeholder="Type your message" required>
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="section settings" style="display: none;">
+        <h2>Settings</h2>
+        <!-- Settings content will go here -->
+    </div>
+</main>
+
+<!-- Bootstrap JS and dependencies via CDN -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

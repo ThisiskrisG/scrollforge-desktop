@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kriston IDE – Hover Car Scroll</title>
+  <style>
+    body { margin: 0; background: #0a0a0a; color: #fff; font-family: monospace; }
+    h1 { text-align: center; padding: 10px; }
+    textarea {
+      width: 90%; height: 300px; margin: 10px auto; display: block;
+      background: #111; color: #0ff; border: 1px solid #333;
+      font-size: 16px; padding: 10px; border-radius: 6px;
+    }
+    button {
+      display: block; margin: 10px auto; font-size: 16px;
+      padding: 10px; border-radius: 6px; background: #0ff; color: #000;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kriston IDE – Hover Car Scroll</h1>
+  <textarea id="scroll">spawn "car" at 2 10 type "car"
+velocity "car" 1.5 0</textarea>
+  <button id="run">▶ Run Scroll</button>
+  <script>
+    document.getElementById("run").onclick = () => {
+      localStorage.setItem("psud_scroll_run", document.getElementById("scroll").value);
+    };
+  </script>
+</body>
+</html>

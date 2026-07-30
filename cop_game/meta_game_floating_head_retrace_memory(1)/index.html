@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Floating Head Platformer</title>
+  <style>
+    body { margin: 0; background: black; color: white; font-family: sans-serif; }
+    canvas { display: block; }
+    #subtitle {
+      position: absolute;
+      bottom: 40px;
+      width: 100%;
+      text-align: center;
+      font-family: monospace;
+      font-size: 18px;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    #subtitle-log {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 40%;
+      max-height: 150px;
+      overflow: hidden;
+      font-family: monospace;
+      font-size: 14px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 5px;
+      display: none;
+    }
+    .subtitle-head { color: cyan; }
+    .subtitle-system { color: lime; font-style: italic; }
+    .subtitle-memory { color: orange; }
+  </style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div id="subtitle" class="subtitle-head"></div>
+<div id="subtitle-log"></div>
+<script src="main.js"></script>
+</body>
+</html>

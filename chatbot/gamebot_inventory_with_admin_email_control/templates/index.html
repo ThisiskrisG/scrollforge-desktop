@@ -1,0 +1,20 @@
+
+<!DOCTYPE html>
+<html>
+<head><title>Game Inventory Tracker</title></head>
+<body>
+<h1>Game Dev Inventory</h1>
+<form method="POST" action="/add">
+    <input name="name" placeholder="Asset Name" required>
+    <input name="category" placeholder="Category" required>
+    <input name="notes" placeholder="Notes">
+    <button type="submit">Add</button>
+</form>
+<ul>
+    {% for asset in assets %}
+        <li><b>{{ asset[1] }}</b> | {{ asset[2] }} - {{ asset[3] }}</li>
+    {% endfor %}
+</ul>
+<a href="/admin">Admin Panel</a> | <a href="/logout">Logout</a>
+</body>
+</html>

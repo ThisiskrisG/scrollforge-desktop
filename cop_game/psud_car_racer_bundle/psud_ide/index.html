@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Psud IDE – Car Physics</title>
+  <style>
+    body { margin: 0; background: #222; overflow: hidden; }
+    #grid {
+      width: 960px; height: 480px;
+      margin: 0 auto; position: relative;
+      background: linear-gradient(to bottom, #333 70%, #070707 30%);
+      border-top: 8px solid #444;
+    }
+    .car {
+      background: #0af;
+      box-shadow: 0 4px 4px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+  <div id="grid"></div>
+  <script>
+window.addEventListener("load", () => {
+  const grid = document.getElementById("grid");
+  const TILE_SIZE = 32;
+  const tiles = {};
+  const physics = {};
+
+  function spawnObject(id, x, y, type = "car") {
+    const obj = document.createElement("div");
+    obj.className = type;
+    obj.style.position = "absolute";
+    obj.style.left = x * TILE_SIZE + "px";
+    obj.style.top = y * TILE_SIZE + "px";
+    obj.style.width = TILE_SIZE * 2 + "px";
+    obj.style.height = TILE_SIZE + "px";
+    obj.style.background = type === "car" ? "#0af" : "#999";
+    obj.style.borderRadius = "6px";
+    obj.style.border = "2px solid #fff";
+    obj.dataset.id = id;
+    obj.dataset.type = type;
+    grid.appendChild(obj);
+    tiles[id] = { x, y, type, el: obj };
+  }
+
+  function setVelocity(id, vx, vy) {
+    physics[id] = { vx, vy };
+  }
+
+  function applyPhysics() {
+    for (let id in physics) {
+      const obj = tiles[id];
+      const p = physics[id];
+      if (!obj) continue;
+      obj.x += p.vx * 0.1;
+      obj.y += p.vy * 0.1;
+      obj.el.style.left = obj.x * TILE_SIZE + "px";
+      obj.el.style.top = obj.y * TILE_SIZE + "px";
+    }
+  }
+
+  setInterval(() => {
+    applyPhysics();
+  }, 100);
+
+  function runPsudScroll() {
+    const scroll = localStorage.getItem("psud_scroll_run");
+    if (!scroll) return;
+
+    const lines = scroll.split("\n");
+    for (let line of lines) {
+      if (line.includes("spawn")) {
+        const match = line.match(/spawn\s+"(\w+)" at (\d+) (\d+)(?: type "(\w+)")?/);
+        if (match) {
+          const type = match[4] || "car";
+          spawnObject(match[1], parseInt(match[2]), parseInt(match[3]), type);
+        }
+      } else if (line.includes("velocity")) {
+        const match = line.match(/velocity\s+"(\w+)" (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/);
+        if (match) setVelocity(match[1], parseFloat(match[2]), parseFloat(match[3]));
+      }
+    }
+
+    localStorage.removeItem("psud_scroll_run");
+  }
+
+  setInterval(runPsudScroll, 500);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kriston IDE</title>
+  <style>
+    body { margin: 0; background: #0a0a0a; color: #fff; font-family: monospace; }
+    h1 { text-align: center; padding: 10px; }
+    #scroll {
+      width: 90%%; height: 300px; margin: 20px auto; display: block;
+      background: #111; color: #0ff; border: 1px solid #333;
+      font-size: 16px; padding: 10px; border-radius: 6px;
+    }
+    #run {
+      display: block; margin: 20px auto; padding: 10px 20px;
+      font-size: 16px; background: #0ff; color: #000;
+      border: none; border-radius: 6px; cursor: pointer;
+    }
+    #log {
+      width: 90%%; margin: 20px auto; background: #111; padding: 10px;
+      border: 1px solid #444; min-height: 50px; color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kriston IDE – Scroll Editor</h1>
+  <textarea id="scroll">ripple "enemy_patrol"</textarea>
+  <button id="run">▶ Run Scroll</button>
+  <div id="log">Output will appear here…</div>
+  <script>
+    const runBtn = document.getElementById("run");
+    const editor = document.getElementById("scroll");
+    const log = document.getElementById("log");
+
+    runBtn.addEventListener("click", () => {
+      const scroll = editor.value;
+      log.innerHTML = "Running...<br>";
+
+      // Naive ripple command parser
+      const rippleMatch = scroll.match(/ripple\s+"([^"]+)"/);
+      if (rippleMatch) {
+        const targetScroll = rippleMatch[1];
+        log.innerHTML += `🔄 Ripple to <b>${targetScroll}</b><br>`;
+
+        // Simulated event bridge to Psud Engine
+        window.localStorage.setItem("psud_ripple", targetScroll);
+      } else {
+        log.innerHTML += "⚠️ No ripple found.<br>";
+      }
+    });
+  </script>
+</body>
+</html>

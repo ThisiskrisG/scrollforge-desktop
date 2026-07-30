@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scrollforge Editor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Scrollforge Editor</h1>
+    <button id="toggle-theme">Switch Theme</button>
+  </header>
+  <div id="editor-container">
+    <textarea id="code" placeholder="Write code here..."></textarea>
+    <iframe id="preview"></iframe>
+  </div>
+  <aside id="sidebar">
+    <h2>Plugins</h2>
+    <div id="plugin-list"></div>
+    <button id="load-plugin">Load Plugin</button>
+  </aside>
+  <script src="storage.js"></script>
+  <script src="scrollsync.js"></script>
+  <script src="plugins/sample-plugin.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

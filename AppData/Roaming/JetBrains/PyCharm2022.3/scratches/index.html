@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Social Media App</title>
+
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.mjs') }}" type="module" crossorigin="use-credentials"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch user profiles from the server
+            fetch('/api/user-profiles')
+                .then(response => response.json())
+                .then(userProfiles => updateUserProfilesList(userProfiles))
+                .catch(error => console.error('Error fetching user profiles:', error));
+        });
+
+        function updateUserProfilesList(userProfiles) {
+            const browseContainer = document.getElementById('browseContainer');
+            browseContainer.innerHTML = ''; // Clear existing content
+
+            userProfiles.forEach(user => {
+                const profileCard = document.createElement('div');
+                profileCard.innerHTML = `
+                    <img src="${user.profile_picture_path}" alt="${user.username} Profile" style="max-width: 100px; max-height: 100px;">
+                    <p>${user.username}</p>
+                `;
+                browseContainer.appendChild(profileCard);
+            });
+        }
+
+        function createPost(event) {
+            event.preventDefault();
+            const postTitle = document.getElementById('postTitle').value;
+            const postContent = document.getElementById('postContent').value;
+
+            const newPost = document.createElement('div');
+            newPost.innerHTML = `
+                <h3>${postTitle}</h3>
+                <p>${postContent}</p>
+                <hr>
+            `;
+
+            const homeSection = document.getElementById('homeSection');
+            homeSection.appendChild(newPost);
+            document.getElementById('postForm').reset();
+        }
+
+        function toggleSection(sectionId) {
+            document.querySelectorAll('main section').forEach(section => {
+                section.style.display = 'none';
+            });
+            const clickedSection = document.getElementById(sectionId);
+            if (clickedSection) {
+                clickedSection.style.display = 'block';
+            }
+        }
+
+        function previewProfilePicture(event) {
+            const input = event.target;
+            const preview = document.getElementById('profilePicture');
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateProfile() {
+            const newBioDescription = document.getElementById('newBioDescription').value;
+            const profilePictureUpload = document.getElementById('profilePictureUpload');
+            const newProfilePicture = profilePictureUpload.files[0];
+
+            document.getElementById('bioDescription').innerText = `Bio Description: ${newBioDescription}`;
+
+            if (newProfilePicture) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imageSrc = e.target.result;
+                    document.getElementById('profilePicture').src = imageSrc;
+                };
+                reader.readAsDataURL(newProfilePicture);
+            }
+        }
+
+        function deactivateAccount() {
+            alert("Account deactivated!");
+        }
+
+        function deleteFriends() {
+            alert("Friends deleted!");
+        }
+
+        function signOut() {
+            if (confirm("Are you sure you want to sign out?")) {
+                fetch('/signout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'  // Use the csrf_token() function correctly
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    } else {
+                        alert("Error signing out. Please try again.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An unexpected error occurred.");
+                });
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <header class="container mt-4">
+        <h1>Your Social Media</h1>
+    </header>
+
+    <nav class="container">
+        <a href="#" onclick="toggleSection('homeSection')">Home</a> |
+        <a href="#" onclick="toggleSection('profileSection')">Profile</a> |
+        <a href="#" onclick="toggleSection('postFeedSection')">Post Feed</a> |
+        <a href="#" onclick="toggleSection('friendSection')">Friends</a> |
+        <a href="#" onclick="toggleSection('messagesSection')">Messages</a> |
+        <a href="#" onclick="toggleSection('settingsSection')">Settings</a> |
+        <a href="#" onclick="toggleSection('browseSection')">Browse</a>
+    </nav>
+
+    <main class="container">
+        <!-- Home Section -->
+        <section id="homeSection" style="display: block;">
+            <h2>Home Section Content</h2>
+        </section>
+
+        <!-- Browse Section -->
+        <section id="browseSection" style="display: none;">
+            <h2>Browse Section</h2>
+            <div id="browseContainer"></div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profileSection" style="display: none;">
+            <h2>Your Profile</h2>
+            <div id="profilePictureContainer">
+                <img id="profilePicture" alt="Profile Picture" style="max-width: 200px; max-height: 200px;">
+            </div>
+            <p id="bioDescription">Bio Description: This is your bio description.</p>
+            <p id="userAge">Age: 25</p>
+
+            <label for="newBioDescription">Update Bio Description:</label>
+            <input type="text" id="newBioDescription" name="newBioDescription">
+            <br>
+
+            <label for="profilePictureUpload">Upload Profile Picture:</label>
+            <input type="file" accept="image/*" id="profilePictureUpload" name="profilePictureUpload" onchange="previewProfilePicture(event)">
+            <br>
+
+            <button onclick="updateProfile()">Update Profile</button>
+        </section>
+
+        <!-- Post Feed Section -->
+        <section id="postFeedSection" style="display: none;">
+            <h2>Create a New Post</h2>
+            <form id="postForm" onsubmit="createPost(event)">
+                <label for="postTitle">Title:</label>
+                <input type="text" id="postTitle" name="postTitle" required>
+                <label for="postContent">Content:</label>
+                <textarea id="postContent" name="postContent" rows="4" required></textarea>
+                <button type="submit">Post</button>
+            </form>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settingsSection" style="display: none;">
+            <h2>Settings</h2>
+            <button onclick="deactivateAccount()">Deactivate Account</button>
+            <button onclick="deleteFriends()">Delete Friends</button>
+
+            <!-- Sign Out Form -->
+            <form method="POST" action="{{ url_for('signout') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- Include CSRF token -->
+                <button type="submit" class="btn btn-primary">Sign Out</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

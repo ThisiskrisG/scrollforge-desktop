@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Frontend Example</title>
+</head>
+<body>
+    <h1>Flask Frontend Integration</h1>
+
+    <form id="dataForm">
+        <label for="inputData">Enter some data:</label>
+        <input type="text" id="inputData" name="inputData" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent default form submission
+
+            const inputData = document.getElementById('inputData').value;
+
+            // Use JavaScript to send data to the backend via POST request
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ input_data: inputData }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the frontend with the result from the backend
+                document.getElementById('result').innerText = data.result;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

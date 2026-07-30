@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engine Simulation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Engine Simulation</h1>
+    <div>
+        <h2>Engine Status:</h2>
+        <p>Current RPM: {{ engine_state['rpm'] }}</p>
+        <p>Status: {{ 'Running' if engine_state['is_running'] else 'Stopped' }}</p>
+    </div>
+
+    <div>
+        <img src="{{ url_for('static', filename='engine.png') }}" alt="Engine Visual" style="width: 400px; height: auto;">
+    </div>
+
+    <div>
+        <button onclick="accelerateEngine()">Accelerate</button>
+        <button onclick="decelerateEngine()">Decelerate</button>
+        <button onclick="stopEngine()">Stop</button>
+    </div>
+
+    <script>
+        async function accelerateEngine() {
+            const response = await fetch('/engine/accelerate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ increment: 1000 })
+            });
+            const data = await response.json();
+            alert(data.message);
+        }
+
+        async function decelerateEngine() {
+            const response = await fetch('/engine/decelerate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ decrement: 1000 })
+            });
+            const data = await response.json();
+            alert(data.message);
+        }
+
+        async function stopEngine() {
+            const response = await fetch('/engine/stop', {
+                method: 'POST'
+            });
+            const data = await response.json();
+            alert(data.message);
+        }
+    </script>
+</body>
+</html>

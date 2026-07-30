@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Users</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #333;
+        }
+        #online-users {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .user {
+            margin: 5px 0;
+            font-size: 16px;
+            padding: 5px;
+            background-color: #e3f2fd;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Online Users</h1>
+    <div id="online-users">
+        {% if online_users %}
+            {% for user in online_users %}
+                <div class="user">{{ user }}</div>
+            {% endfor %}
+        {% else %}
+            <p>No users online.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        // Connect to Socket.IO
+        const socket = io();
+
+        // Listen for the user_connected event and update the online user list
+        socket.on('user_connected', function(data) {
+            const onlineUsersDiv = document.getElementById('online-users');
+            const newUserDiv = document.createElement('div');
+            newUserDiv.classList.add('user');
+            newUserDiv.textContent = data.username;
+            onlineUsersDiv.appendChild(newUserDiv);
+        });
+
+        // Listen for the user_disconnected event and remove the user from the list
+        socket.on('user_disconnected', function(data) {
+            const onlineUsersDiv = document.getElementById('online-users');
+            const userDivs = onlineUsersDiv.getElementsByClassName('user');
+            for (let userDiv of userDivs) {
+                if (userDiv.textContent === data.username) {
+                    onlineUsersDiv.removeChild(userDiv);
+                    break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

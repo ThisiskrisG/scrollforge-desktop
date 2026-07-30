@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Psud IDE</title>
+  <style>
+    body { margin: 0; background: #111; overflow: hidden; }
+    #grid {
+      width: 640px; height: 480px;
+      margin: 0 auto; position: relative;
+      background: #222;
+    }
+  </style>
+</head>
+<body>
+  <div id="grid"></div>
+  <script>
+  
+window.addEventListener("load", () => {
+  const grid = document.getElementById("grid");
+  const TILE_SIZE = 32;
+  const tiles = {};
+
+  function spawnObject(id, x, y) {
+    const obj = document.createElement("div");
+    obj.className = "orb";
+    obj.style.position = "absolute";
+    obj.style.left = x * TILE_SIZE + "px";
+    obj.style.top = y * TILE_SIZE + "px";
+    obj.style.width = TILE_SIZE + "px";
+    obj.style.height = TILE_SIZE + "px";
+    obj.style.borderRadius = "50%";
+    obj.style.background = "#0ff";
+    obj.dataset.id = id;
+    grid.appendChild(obj);
+    tiles[id] = { x, y, el: obj };
+  }
+
+  function moveObject(id, dir, dist) {
+    const obj = tiles[id];
+    if (!obj) return;
+    if (dir === "right") obj.x += dist;
+    if (dir === "left") obj.x -= dist;
+    if (dir === "down") obj.y += dist;
+    if (dir === "up") obj.y -= dist;
+    obj.el.style.left = obj.x * TILE_SIZE + "px";
+    obj.el.style.top = obj.y * TILE_SIZE + "px";
+  }
+
+  function runPsudScroll() {
+    const scroll = localStorage.getItem("psud_scroll_run");
+    if (!scroll) return;
+
+    const lines = scroll.split("\n");
+    for (let line of lines) {
+      if (line.includes("spawn")) {
+        const match = line.match(/spawn\s+"(\w+)" at (\d+) (\d+)/);
+        if (match) {
+          spawnObject(match[1], parseInt(match[2]), parseInt(match[3]));
+        }
+      } else if (line.includes("move")) {
+        const match = line.match(/move\s+"(\w+)" (\w+) (\d+)/);
+        if (match) {
+          moveObject(match[1], match[2], parseInt(match[3]));
+        }
+      }
+    }
+
+    localStorage.removeItem("psud_scroll_run");
+  }
+
+  setInterval(runPsudScroll, 500);
+});
+
+  </script>
+</body>
+</html>

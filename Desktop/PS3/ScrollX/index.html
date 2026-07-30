@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>ScrollX Recorder</title>
+<style>
+    body { margin:0; padding:40px; background:#0f172a; color:white; font-family:sans-serif; text-align:center; }
+    video { width:90%; max-width:700px; border-radius:12px; background:#000; margin:20px auto; display:block; }
+    button { padding:18px 40px; font-size:19px; margin:12px; border:none; border-radius:10px; cursor:pointer; }
+    .cam { background:#4ade80; color:black; }
+    .rec { background:#ef4444; color:white; }
+</style>
+</head>
+<body>
+    <h1>ScrollX Camera</h1>
+    <video id="video" autoplay playsinline></video>
+    <div>
+        <button class="cam" onclick="startCamera()">Start Camera</button>
+        <button class="rec" id="recBtn" onclick="toggleRecording()" disabled>Start Recording</button>
+    </div>
+    <div id="status">Waiting...</div>
+
+<script>
+let stream = null;
+let recorder = null;
+let chunks = [];
+
+const video = document.getElementById('video');
+const status = document.getElementById('status');
+const recBtn = document.getElementById('recBtn');
+
+window.startCamera = async function() {
+    status.textContent = "Requesting permission...";
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        video.srcObject = stream;
+        recBtn.disabled = false;
+        status.textContent = "✅ Camera active";
+    } catch (e) {
+        status.textContent = "❌ Blocked. Try allowing in browser settings.";
+    }
+};
+
+window.toggleRecording = function() {
+    if (!stream) return;
+    if (recorder && recorder.state === "recording") {
+        recorder.stop();
+        recBtn.textContent = "Start Recording";
+    } else {
+        chunks = [];
+        recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+            const blob = new Blob(chunks, {type: 'video/webm'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recording.webm';
+            a.click();
+            status.textContent = "✅ Downloaded!";
+        };
+        recorder.start();
+        recBtn.textContent = "Stop Recording";
+        status.textContent = "🔴 Recording...";
+    }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <title>Electron IDE</title>
+    <style>
+        body { margin: 0; display: flex; height: 100vh; }
+        #editor { flex: 3; }
+        #terminal { flex: 1; background: #000; color: #0f0; }
+    </style>
+</head>
+<body>
+    <div id='editor'></div>
+    <div id='terminal'></div>
+    <script src='renderer.js'></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <meta charset="utf-8">
+    <title>Scrollforge World</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script>
+      AFRAME.registerComponent('launch-ripple-trail', {
+        init: function () {
+          this.el.addEventListener('click', () => {
+            this.el.setAttribute('color', '#ff8888');
+            setTimeout(() => {
+              window.location.href = 'ripple_bloom_intro.html';
+            }, 700);
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene background="color: #111">
+
+      <!-- Camera and Cursor -->
+      <a-entity camera position="0 1.6 3">
+        <a-cursor fuse="false" raycaster="objects: .clickable"></a-cursor>
+      </a-entity>
+
+      <!-- Whisper Gallery Orb -->
+      <a-sphere position="-2 1.5 -2" radius="0.5" color="#00ffff" class="clickable"
+                onclick="location.href='whisper_gallery.html'"></a-sphere>
+      <a-text value="Whisper Gallery" position="-2 2.4 -2" align="center" color="#fff" width="4"></a-text>
+
+      <!-- KristonIDE Orb -->
+      <a-sphere position="0 1.5 -2" radius="0.5" color="#ffaa00" class="clickable"
+                onclick="location.href='kriston_ide.html'"></a-sphere>
+      <a-text value="KristonIDE" position="0 2.4 -2" align="center" color="#fff" width="4"></a-text>
+
+      <!-- Ripple Trail Orb -->
+      <a-sphere position="2 1.5 -2" radius="0.5" color="#ff4444" class="clickable" launch-ripple-trail></a-sphere>
+      <a-text value="Ripple Trail" position="2 2.4 -2" align="center" color="#fff" width="4"></a-text>
+
+    </a-scene>
+  </body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scrollforge Server Edition</title>
+  <link rel="stylesheet" href="style.css" />
+
+<!-- CodeMirror -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+
+<style>
+  .CodeMirror {
+    position: fixed;
+    top: 80px;
+    left: 240px;
+    width: calc(100% - 260px);
+    height: calc(100% - 100px);
+    font-size: 14px;
+    border-radius: 6px;
+  }
+</style>
+
+<script>
+  let codeMirror;
+  window.onload = function () {
+    refreshFiles();
+    codeMirror = CodeMirror.fromTextArea(document.getElementById("codeArea"), {
+      lineNumbers: true,
+      mode: "javascript",
+      theme: "dracula",
+      matchBrackets: true,
+      autoCloseBrackets: true,
+    });
+  };
+
+  function detectMode(filename) {
+    if (filename.endsWith('.html')) return 'htmlmixed';
+    if (filename.endsWith('.py')) return 'python';
+    return 'javascript';
+  }
+
+  function switchTab(file) {
+    currentFile = file;
+    const mode = detectMode(file);
+    codeMirror.setOption("mode", mode);
+    codeMirror.setValue(openTabs[file].code);
+    Array.from(tabBar.children).forEach(t => t.classList.remove('active'));
+    openTabs[file].tab.classList.add('active');
+  }
+
+  function saveCode() {
+    if (!currentFile) return alert('No file loaded');
+    const code = codeMirror.getValue();
+    openTabs[currentFile].code = code;
+    fetch('/file/' + currentFile, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    }).then(() => alert('Saved ' + currentFile));
+  }
+</script>
+
+</head>
+<body>
+
+<div id="room-layout">
+  <div class="room" id="room-dev">
+    <span class="room-title">Dev Room</span>
+    <div class="user-icon" style="left:10px; top:20px;">👩‍💻 Alice</div>
+    <div class="user-icon" style="left:60px; top:40px;">🧑‍💻 Bob</div>
+  </div>
+  <div class="room" id="room-preview">
+    <span class="room-title">Preview Room</span>
+    <div class="user-icon" style="left:30px; top:15px;">🧙‍♂️ DevMage</div>
+  </div>
+</div>
+
+
+<div id="vr-map">
+  <div class="map-zone" onclick="jumpTo('editor')">📝 Editor</div>
+  <div class="map-zone" onclick="jumpTo('files')">📁 Files</div>
+  <div class="map-zone" onclick="jumpTo('preview')">🌐 Preview</div>
+</div>
+
+<script>
+function jumpTo(target) {
+  alert("Teleporting to: " + target);  // Placeholder for real scroll logic
+}
+</script>
+
+  <header>
+    <h1>Scrollforge IDE</h1>
+  </header>
+  <div id="layout">
+    <aside id="file-list">
+      <h3>Files</h3>
+      <ul id="files">
+        <!-- populated dynamically -->
+      </ul>
+    </aside>
+    <main>
+      <textarea id="editor" style="width: 100%; height: 300px;"></textarea>
+      <button onclick="saveFile()">💾 Save</button>
+    </main>
+  </div>
+<script>
+let currentFile = "";
+
+function listFiles() {
+  fetch("files/").then(() => {
+    const files = ['index.html', 'main.js'];
+    const ul = document.getElementById("files");
+    ul.innerHTML = "";
+    files.forEach(name => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <span onclick="loadFile('${name}')">${name}</span>
+        <button onclick="renameFile('${name}')">✏️</button>
+        <button onclick="deleteFile('${name}')">🗑</button>
+      `;
+      ul.appendChild(li);
+    });
+  });
+}
+
+function loadFile(name) {
+  fetch("files/" + name)
+    .then(res => res.text())
+    .then(txt => {
+      document.getElementById("editor").value = txt;
+      currentFile = name;
+    });
+}
+
+function saveFile() {
+  if (!currentFile) return alert("No file loaded.");
+  fetch("files/" + currentFile, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: document.getElementById("editor").value
+  });
+  alert("Saved.");
+}
+
+function renameFile(oldName) {
+  const newName = prompt("Rename to:", oldName);
+  if (!newName || newName === oldName) return;
+  fetch("/rename", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ oldName, newName })
+  }).then(() => listFiles());
+}
+
+function deleteFile(name) {
+  if (!confirm("Delete " + name + "?")) return;
+  fetch("/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name })
+  }).then(() => listFiles());
+}
+
+window.onload = listFiles;
+</script>
+
+<script>
+  // Simulate current user and room
+  const currentUser = localStorage.getItem('scrollsync_username') || '🧑 Guest';
+  const currentRoom = localStorage.getItem('scrollsync_room') || 'dev';
+
+  // Insert the user into the correct room zone
+  window.onload = () => {
+    const userDiv = document.createElement('div');
+    userDiv.className = 'user-icon';
+    userDiv.style.left = (Math.random() * 100) + 'px';
+    userDiv.style.top = (Math.random() * 60) + 'px';
+    userDiv.textContent = currentUser;
+
+    const roomElement = document.getElementById('room-' + currentRoom);
+    if (roomElement) {
+      roomElement.appendChild(userDiv);
+    }
+  };
+</script>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const username = localStorage.getItem('scrollsync_username') || '👤 Guest';
+  const room = localStorage.getItem('scrollsync_room') || 'dev';
+
+  socket.emit('joinRoom', { username, room });
+
+  socket.on('userList', (users) => {
+    const roomElement = document.getElementById('room-' + room);
+    if (roomElement) {
+      roomElement.querySelectorAll('.user-icon').forEach(el => el.remove());
+      users.forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'user-icon';
+        div.textContent = user.username;
+        div.style.left = (Math.random() * 100) + 'px';
+        div.style.top = (Math.random() * 60) + 'px';
+        roomElement.appendChild(div);
+      });
+    }
+  });
+</script>
+
+
+<div id="chat-box">
+  <div id="chat-messages"></div>
+  <input id="chat-input" type="text" placeholder="Say something...">
+  <button onclick="sendChat()">Send</button>
+</div>
+
+<script>
+  const chatBox = document.getElementById('chat-box');
+  const chatMessages = document.getElementById('chat-messages');
+  const chatInput = document.getElementById('chat-input');
+
+  function sendChat() {
+    const message = chatInput.value.trim();
+    if (message !== '') {
+      socket.emit('chatMessage', { username, message });
+      chatInput.value = '';
+    }
+  }
+
+  socket.on('chatMessage', ({ username, message }) => {
+    const entry = document.createElement('div');
+    entry.innerHTML = '<strong>' + username + ':</strong> ' + message;
+    chatMessages.appendChild(entry);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendChat();
+  });
+</script>
+
+
+<div id="shared-editor">
+  <textarea id="code-area" placeholder="Start coding together..."></textarea>
+</div>
+
+<script>
+  const codeArea = document.getElementById('code-area');
+
+  let ignoreIncoming = false;
+
+  codeArea.addEventListener('input', () => {
+    const code = codeArea.value;
+    ignoreIncoming = true;
+    socket.emit('codeUpdate', { room, code });
+  });
+
+  socket.on('codeUpdate', ({ code }) => {
+    if (!ignoreIncoming) {
+      codeArea.value = code;
+    }
+    ignoreIncoming = false;
+  });
+</script>
+
+
+<div id="save-load-controls">
+  <button onclick="saveCode()">💾 Save</button>
+  <button onclick="loadCode()">📂 Load</button>
+</div>
+
+<script>
+  const saveKey = 'code_' + room;
+
+  function saveCode() {
+    const code = codeArea.value;
+    localStorage.setItem(saveKey, code);
+    alert('Code saved for room: ' + room);
+  }
+
+  function loadCode() {
+    const saved = localStorage.getItem(saveKey);
+    if (saved !== null) {
+      codeArea.value = saved;
+      socket.emit('codeUpdate', { room, code: saved });
+    } else {
+      alert('No saved code found for this room.');
+    }
+  }
+</script>
+
+
+<div id="cloud-controls">
+  <button onclick="cloudSave()">☁️ Sync</button>
+  <button onclick="cloudLoad()">🌐 Load</button>
+</div>
+
+<script>
+  function cloudSave() {
+    const code = codeArea.value;
+    fetch('/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ room, code })
+    }).then(() => alert('Code synced to cloud for room: ' + room));
+  }
+
+  function cloudLoad() {
+    fetch('/load/' + room)
+      .then(res => res.json())
+      .then(data => {
+        codeArea.value = data.code || '';
+        socket.emit('codeUpdate', { room, code: data.code || '' });
+      });
+  }
+</script>
+
+
+<div id="file-sidebar">
+  <h3>📁 Files</h3>
+  <ul id="file-list"></ul>
+  <input id="new-filename" placeholder="new_file.js">
+  <button onclick="createFile()">Create</button>
+</div>
+
+<script>
+  const fileList = document.getElementById('file-list');
+
+  function refreshFiles() {
+    fetch('/files').then(res => res.json()).then(files => {
+      fileList.innerHTML = '';
+      files.forEach(file => {
+        const li = document.createElement('li');
+        li.textContent = file;
+        li.onclick = () => {
+          fetch('/file/' + file)
+            .then(res => res.json())
+            .then(data => {
+              codeArea.value = data.code;
+              currentFile = file;
+            });
+        };
+        li.oncontextmenu = (e) => {
+          e.preventDefault();
+          const newName = prompt('Rename to:', file);
+          if (newName)
+            fetch('/rename', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ oldName: file, newName })
+            }).then(refreshFiles);
+        };
+        li.ondblclick = () => {
+          if (confirm('Delete ' + file + '?'))
+            fetch('/file/' + file, { method: 'DELETE' }).then(refreshFiles);
+        };
+        fileList.appendChild(li);
+      });
+    });
+  }
+
+  function createFile() {
+    const name = document.getElementById('new-filename').value;
+    if (!name) return;
+    fetch('/file/' + name, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: '' })
+    }).then(refreshFiles);
+  }
+
+  let currentFile = '';
+
+  function saveCode() {
+    if (!currentFile) return alert('No file loaded');
+    const code = codeArea.value;
+    fetch('/file/' + currentFile, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    }).then(() => alert('Saved ' + currentFile));
+  }
+
+  window.onload = refreshFiles;
+</script>
+
+
+<div id="tab-bar"></div>
+
+<script>
+  const tabBar = document.getElementById('tab-bar');
+  const openTabs = {};
+
+  function openTab(file, code = '') {
+    if (openTabs[file]) {
+      switchTab(file);
+      return;
+    }
+
+    const tab = document.createElement('div');
+    tab.className = 'tab';
+    tab.textContent = file;
+    tab.onclick = () => switchTab(file);
+
+    const close = document.createElement('span');
+    close.textContent = ' ×';
+    close.onclick = (e) => {
+      e.stopPropagation();
+      delete openTabs[file];
+      tabBar.removeChild(tab);
+      if (file === currentFile) {
+        codeArea.value = '';
+        currentFile = '';
+      }
+    };
+
+    tab.appendChild(close);
+    tabBar.appendChild(tab);
+    openTabs[file] = { tab, code };
+    switchTab(file);
+  }
+
+  function switchTab(file) {
+    currentFile = file;
+    codeArea.value = openTabs[file].code;
+    Array.from(tabBar.children).forEach(t => t.classList.remove('active'));
+    openTabs[file].tab.classList.add('active');
+  }
+
+  function refreshFiles() {
+    fetch('/files').then(res => res.json()).then(files => {
+      fileList.innerHTML = '';
+      files.forEach(file => {
+        const li = document.createElement('li');
+        li.textContent = file;
+        li.onclick = () => {
+          fetch('/file/' + file)
+            .then(res => res.json())
+            .then(data => {
+              openTab(file, data.code);
+            });
+        };
+        li.oncontextmenu = (e) => {
+          e.preventDefault();
+          const newName = prompt('Rename to:', file);
+          if (newName)
+            fetch('/rename', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ oldName: file, newName })
+            }).then(refreshFiles);
+        };
+        li.ondblclick = () => {
+          if (confirm('Delete ' + file + '?'))
+            fetch('/file/' + file, { method: 'DELETE' }).then(refreshFiles);
+        };
+        fileList.appendChild(li);
+      });
+    });
+  }
+
+  function saveCode() {
+    if (!currentFile) return alert('No file loaded');
+    const code = codeArea.value;
+    openTabs[currentFile].code = code;
+    fetch('/file/' + currentFile, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    }).then(() => alert('Saved ' + currentFile));
+  }
+
+  window.onload = refreshFiles;
+</script>
+
+
+<div id="upload-box">
+  <input type="file" id="file-upload" />
+  <button onclick="uploadFile()">Upload</button>
+</div>
+
+<script>
+  function uploadFile() {
+    const fileInput = document.getElementById('file-upload');
+    if (!fileInput.files.length) return alert("Choose a file first");
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    fetch('/upload', { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        alert("Uploaded: " + data.file);
+        refreshFiles();
+      });
+  }
+</script>
+
+
+<div id="deploy-box">
+  <button onclick="deploy()">🚀 Deploy to Server</button>
+</div>
+
+<script>
+  function deploy() {
+    fetch('/deploy', { method: 'POST' })
+      .then(res => res.json())
+      .then(() => {
+        alert('Project deployed to /deploy/index.html');
+        window.open('/deploy/index.html', '_blank');
+      });
+  }
+</script>
+
+
+<div id="terminal-box">
+  <div id="terminal-output"></div>
+  <input id="terminal-input" placeholder="Type a command (e.g. ls, git status)" />
+</div>
+
+<script>
+  const termInput = document.getElementById("terminal-input");
+  const termOutput = document.getElementById("terminal-output");
+  const commandHistory = [];
+  let historyIndex = -1;
+
+  termInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      const cmd = termInput.value;
+      commandHistory.push(cmd);
+      historyIndex = commandHistory.length;
+      termOutput.innerHTML += "<div><span style='color:#0f0;'>>> </span>" + cmd + "</div>";
+      fetch('/terminal', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: cmd })
+      }).then(res => res.json()).then(data => {
+        const out = document.createElement("div");
+        out.textContent = data.output;
+        termOutput.appendChild(out);
+        termOutput.scrollTop = termOutput.scrollHeight;
+      });
+      termInput.value = "";
+    } else if (e.key === "ArrowUp") {
+      if (historyIndex > 0) termInput.value = commandHistory[--historyIndex];
+    } else if (e.key === "ArrowDown") {
+      if (historyIndex < commandHistory.length - 1) termInput.value = commandHistory[++historyIndex];
+      else termInput.value = "";
+    }
+  });
+</script>
+
+
+<div id="terminal-tabs"></div>
+<div id="terminal-boxes"></div>
+<button id="new-terminal-btn" onclick="newTerminalTab()">➕ New Terminal</button>
+
+<script>
+  let terminals = {};
+  let termCounter = 0;
+  let currentTermId = null;
+
+  function newTerminalTab() {
+    const termId = "term" + (++termCounter);
+    const tab = document.createElement("button");
+    tab.textContent = "Terminal " + termCounter;
+    tab.className = "term-tab";
+    tab.onclick = () => switchTerminal(termId);
+    tab.ondblclick = () => {
+      const input = document.createElement("input");
+      input.value = tab.textContent;
+      input.style.fontSize = "12px";
+      tab.textContent = "";
+      tab.appendChild(input);
+      input.focus();
+      input.onblur = () => tab.textContent = input.value;
+      input.onkeydown = (e) => {
+        if (e.key === "Enter") input.blur();
+      };
+    };
+
+    document.getElementById("terminal-tabs").appendChild(tab);
+
+    const box = document.createElement("div");
+    box.className = "terminal-box";
+    box.innerHTML = \`
+      <div class="terminal-output" id="output-\${termId}"></div>
+      <input class="terminal-input" id="input-\${termId}" placeholder="Type a command..." />
+    \`;
+    box.style.display = "none";
+    document.getElementById("terminal-boxes").appendChild(box);
+
+    const input = box.querySelector("input");
+    const output = box.querySelector(".terminal-output");
+    const history = [];
+    let index = -1;
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const cmd = input.value;
+        history.push(cmd); index = history.length;
+        output.innerHTML += \`<div><span style='color:#0f0;'>>> </span>\${cmd}</div>\`;
+        fetch('/terminal', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ command: cmd })
+        }).then(res => res.json()).then(data => {
+          const out = document.createElement("div");
+          out.textContent = data.output;
+          output.appendChild(out);
+          output.scrollTop = output.scrollHeight;
+        });
+        input.value = "";
+      } else if (e.key === "ArrowUp") {
+        if (index > 0) input.value = history[--index];
+      } else if (e.key === "ArrowDown") {
+        if (index < history.length - 1) input.value = history[++index];
+        else input.value = "";
+      }
+    });
+
+    terminals[termId] = { tab, box };
+    switchTerminal(termId);
+  }
+
+  function switchTerminal(termId) {
+    if (currentTermId) terminals[currentTermId].box.style.display = "none";
+    currentTermId = termId;
+    terminals[termId].box.style.display = "flex";
+    Array.from(document.getElementsByClassName("term-tab")).forEach(t => t.classList.remove("active"));
+    terminals[termId].tab.classList.add("active");
+    terminals[termId].box.querySelector("input").focus();
+  }
+
+  window.onload = () => {
+    newTerminalTab();
+  };
+</script>
+
+</body>
+</html>

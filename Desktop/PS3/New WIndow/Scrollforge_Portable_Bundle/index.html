@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scrollforge IDE with Plugin Sidebar</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; }
+    #toolbar { background: #111; color: white; padding: 10px; display: flex; justify-content: space-between; }
+    #main { display: flex; flex: 1; }
+    #vault { width: 200px; background: #222; color: white; padding: 10px; overflow-y: auto; }
+    #plugins { width: 200px; background: #333; color: white; padding: 10px; overflow-y: auto; }
+    #editor-panel { flex: 1; display: flex; flex-direction: column; }
+    #code { flex-grow: 1; font-family: monospace; font-size: 14px; width: 100%; display: block; }
+    #preview-frame { flex-grow: 1; width: 100%; border: none; display: none; }
+    #output { height: 100px; overflow: auto; padding: 10px; background: #f0f0f0; }
+    .file-entry, .plugin-entry { padding: 6px; cursor: pointer; border-bottom: 1px solid #444; }
+    .file-entry:hover, .plugin-entry:hover { background: #444; }
+    #file-input { display: none; }
+  </style>
+</head>
+<body>
+  <div id="toolbar">
+    <div>Scrollforge IDE</div>
+    <div>
+      <button onclick="triggerUpload()">Upload</button>
+      <button onclick="runCode()">Run</button>
+      <button onclick="togglePreview()">Preview</button>
+      <input type="file" id="file-input" multiple onchange="handleFiles(this.files)">
+    </div>
+  </div>
+  <div id="main">
+    <div id="vault">
+      <h3>Vault</h3>
+      <div id="file-list"></div>
+    </div>
+    <div id="plugins">
+      <h3>Plugins</h3>
+      <div id="plugin-list"></div>
+    </div>
+    <div id="editor-panel">
+      <textarea id="code" placeholder="Your code here..."></textarea>
+      <iframe id="preview-frame"></iframe>
+      <div id="output"></div>
+    </div>
+  </div>
+  <script src="vault.js"></script>
+</body>
+</html>

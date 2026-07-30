@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head><title>Home</title></head>
+<body>
+<h2>Welcome, {{ username }}!</h2>
+
+<h3>Add New Asset</h3>
+<form method="POST" action="/add" enctype="multipart/form-data">
+    <input name="name" placeholder="Asset Name" required><br>
+    <input name="category" placeholder="Category (sprite, level, etc.)" required><br>
+    <input name="notes" placeholder="Notes"><br>
+    <input type="file" name="file"><br>
+    <button type="submit">Add Asset</button>
+</form>
+
+<h3>Your Assets</h3>
+<ul>
+{% for asset in assets %}
+    <li><b>{{ asset[1] }}</b> - {{ asset[2] }} ({{ asset[3] }})
+    {% if asset[4] %}
+        <br><a href="{{ asset[4] }}" target="_blank">View File</a>
+    {% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+<a href="/logout">Logout</a>
+</body>
+</html>

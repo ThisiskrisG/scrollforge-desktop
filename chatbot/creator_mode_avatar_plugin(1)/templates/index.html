@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Creator Mode - Avatar Upload</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Upload Your Avatar</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="avatar" accept="image/*">
+        <button type="submit">Upload</button>
+    </form>
+    <div id="avatars"></div>
+    <script>
+        const socket = io();
+        const form = document.getElementById('uploadForm');
+        const avatarsDiv = document.getElementById('avatars');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const res = await fetch('/upload_avatar', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            socket.emit('new_avatar', data.filename);
+        });
+
+        socket.on('update_avatar', (filename) => {
+            const img = document.createElement('img');
+            img.src = '/static/avatars/' + filename;
+            img.style.width = '100px';
+            avatarsDiv.appendChild(img);
+        });
+    </script>
+</body>
+</html>

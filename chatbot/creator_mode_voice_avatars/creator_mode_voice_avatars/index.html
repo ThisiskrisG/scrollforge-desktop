@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Creator Mode Voice Room</title>
+  <style>
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 10px;
+      position: relative;
+      display: inline-block;
+      border: 2px solid #00ffcc;
+    }
+    .avatar.muted {
+      filter: grayscale(100%);
+      opacity: 0.5;
+    }
+    .mute-icon {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 18px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 4px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Connected Users</h2>
+  <div id="user-list"></div>
+
+  <button id="muteBtn">Mute</button>
+
+  <script>
+    const USERNAME = "User" + Math.floor(Math.random() * 1000);
+  </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/static/rtc.js"></script>
+</body>
+</html>

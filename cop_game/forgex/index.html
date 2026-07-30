@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ForgeX IDE – Plugin Builder</title>
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="theme.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+  <header class="header">
+    <img src="assets/logo.svg" alt="ForgeX Logo" class="logo" />
+    <h1>Welcome to ForgeX IDE</h1>
+  </header>
+
+  <main class="main-ui">
+    <section class="plugin-list">
+      <h2>Your Installed Plugins</h2>
+      <div id="plugin-container"></div>
+    </section>
+
+    <section class="actions">
+      <button onclick="openPluginInstaller()">Install Plugin</button>
+      <button onclick="runAllTests()">Run Tests</button>
+      <button onclick="openOptimizer()">Optimize</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>ForgeX IDE © 2025</p>
+  </footer>
+
+  <script src="plugin_loader.js"></script>
+  <script src="plugin_installer.js"></script>
+  <script src="plugin_updater.js"></script>
+  <script src="plugin_profiler.js"></script>
+  <script src="plugin_test_runner.js"></script>
+  <script src="plugin_optimizer.js"></script>
+</body>
+</html>

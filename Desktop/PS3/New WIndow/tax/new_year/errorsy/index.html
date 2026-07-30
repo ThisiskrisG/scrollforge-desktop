@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Chat Room</h1>
+    <div id="messages"></div>
+    <input id="messageInput" placeholder="Type a message..." autocomplete="off">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const socket = io();
+
+        // Join a room (e.g., "chat_room_1")
+        const room = "chat_room_1";
+        socket.emit('join', { room });
+
+        // Listen for incoming messages
+        socket.on('message', data => {
+            const messagesDiv = document.getElementById('messages');
+            const newMessage = document.createElement('div');
+            newMessage.innerText = `${data.username || 'Server'}: ${data.msg}`;
+            messagesDiv.appendChild(newMessage);
+        });
+
+   function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value;
+
+    if (message.trim()) {
+        const receiverId = 2; // Replace with the actual receiver ID
+        socket.emit('send_message', { room, message, receiver_id: receiverId });
+        input.value = '';
+    }
+}
+
+    </script>
+</body>
+</html>

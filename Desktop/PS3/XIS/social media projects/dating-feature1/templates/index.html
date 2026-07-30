@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal</title>
+</head>
+<body>
+    <h1>Engine Control Portal</h1>
+    <form method="POST" action="{{ url_for('portal') }}">
+        <label for="engine">Engine Status:</label>
+        <select name="engine" id="engine">
+            <option value="off" {% if not engine_state %}selected{% endif %}>Off</option>
+            <option value="on" {% if engine_state %}selected{% endif %}>On</option>
+        </select>
+        <button type="submit">Update</button>
+    </form>
+    <p>Current Engine State: {{ 'On' if engine_state else 'Off' }}</p>
+    <a href="{{ url_for('portal') }}">Go to Portal</a>
+</body>
+</html>

@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Voice Control Preview</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; }
+        .control-panel { background: #f9f9f9; padding: 1rem; border: 1px solid #ccc; border-radius: 8px; width: 300px; }
+        .mic-indicator { width: 20px; height: 20px; border-radius: 50%; background: red; display: inline-block; margin-right: 10px; }
+        .mic-on { background: green; }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <div>
+            <span class="mic-indicator mic-on" id="micStatus"></span>
+            <span id="micLabel">Microphone On</span>
+        </div>
+        <button onclick="toggleMic()">Toggle Microphone</button>
+    </div>
+    <script>
+        function toggleMic() {
+            const mic = document.getElementById("micStatus");
+            const label = document.getElementById("micLabel");
+            if (mic.classList.contains("mic-on")) {
+                mic.classList.remove("mic-on");
+                label.innerText = "Microphone Off";
+            } else {
+                mic.classList.add("mic-on");
+                label.innerText = "Microphone On";
+            }
+        }
+    </script>
+</body>
+</html>

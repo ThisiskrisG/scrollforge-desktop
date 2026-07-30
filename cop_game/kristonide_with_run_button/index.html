@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>KristonIDE-lite</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #f5f5f5;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 1em;
+      background: #222;
+      color: #facc15;
+      font-size: 1.2em;
+    }
+    #editor {
+      flex: 1;
+    }
+    .CodeMirror {
+      height: 100%;
+      font-size: 14px;
+      background: #1a1a1a;
+      color: #facc15;
+    }
+  </style>
+</head>
+<body>
+  <header>🕊️ KristonIDE-lite — Scroll Editor</header>
+  <textarea id="editor">// Begin your scroll or reflex logic here...</textarea>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <script>
+    const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+      lineNumbers: true,
+      mode: "javascript",
+      theme: "default"
+    });
+  </script>
+  <button onclick="runCalc()" style="position: fixed; top: 10px; right: 10px; z-index: 10;">▶️ Run Scroll</button>
+  <script src="calc-engine.js"></script>
+  <script>
+    function runCalc() {
+      const code = editor.getValue();
+      const ast = parseCalc(code);
+      interpretAST(ast);
+    }
+  </script>
+</body>
+</html>

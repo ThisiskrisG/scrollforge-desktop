@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Creator Mode Chat</title>
+    <style>
+        body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; }
+        #chat { height: 300px; overflow-y: scroll; border: 1px solid #444; margin-bottom: 10px; padding: 10px; }
+        #users { font-size: 14px; color: #ccc; margin-bottom: 10px; }
+        #typing { font-style: italic; font-size: 12px; color: #aaa; }
+    </style>
+</head>
+<body>
+    <h2>Creator Mode Live Chat</h2>
+    <div id="users">Online:</div>
+    <div id="chat"></div>
+    <div id="typing"></div>
+    <input type="text" id="username" placeholder="Enter username"><br><br>
+    <input type="text" id="message" placeholder="Type message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const chat = document.getElementById("chat");
+        const users = document.getElementById("users");
+        const typing = document.getElementById("typing");
+        const usernameInput = document.getElementById("username");
+        const messageInput = document.getElementById("message");
+
+        let username = "";
+
+        usernameInput.addEventListener("change", () => {
+            username = usernameInput.value;
+            socket.emit("register_user", { username });
+        });
+
+        messageInput.addEventListener("input", () => {
+            socket.emit("typing", { user: username });
+        });
+
+        function sendMessage() {
+            const message = messageInput.value;
+            socket.emit("chat_message", { user: username, message });
+            messageInput.value = "";
+        }
+
+        socket.on("chat_message", data => {
+            chat.innerHTML += `<div><b>${data.user}</b>: ${data.message}</div>`;
+        });
+
+        socket.on("user_list", data => {
+            users.innerHTML = "Online: " + data.join(", ");
+        });
+
+        socket.on("typing", data => {
+            typing.innerText = `${data.user} is typing...`;
+            setTimeout(() => typing.innerText = "", 2000);
+        });
+    </script>
+</body>
+</html>

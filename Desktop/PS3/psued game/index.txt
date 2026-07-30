@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>PSUD Studio Marketplace</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<header>
+
+<h1>PSUD Studio Marketplace</h1>
+
+<p>
+Discover tools, plugins, assets, and extensions
+</p>
+
+</header>
+
+
+<section class="features">
+
+
+<div>
+
+<h2>🎮 Game Tools</h2>
+
+<p>
+Add new gameplay systems and editor tools.
+</p>
+
+<a href="#">
+Explore Plugins →
+</a>
+
+</div>
+
+
+<div>
+
+<h2>🎨 Asset Packs</h2>
+
+<p>
+Models, textures, audio, and effects.
+</p>
+
+<a href="#">
+Browse Assets →
+</a>
+
+</div>
+
+
+<div>
+
+<h2>💻 Developer Tools</h2>
+
+<p>
+Improve your workflow with custom extensions.
+</p>
+
+<a href="#">
+View Tools →
+</a>
+
+</div>
+
+
+</section>
+
+
+<section>
+
+<h2>Featured Plugins</h2>
+
+
+<div class="features">
+
+
+<div>
+
+<h3>Terrain Builder</h3>
+
+<p>
+Create landscapes and worlds.
+</p>
+
+</div>
+
+
+<div>
+
+<h3>Dialogue System</h3>
+
+<p>
+Build NPC conversations.
+</p>
+
+</div>
+
+
+<div>
+
+<h3>Inventory Kit</h3>
+
+<p>
+Add item systems to games.
+</p>
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+<section>
+
+<h2>Submit a Plugin</h2>
+
+<p>
+Developers can submit their own PSUD Studio extensions.
+</p>
+
+<a class="download" href="submit.html">
+Submit Plugin
+</a>
+
+</section>
+
+
+</body>
+
+</html>

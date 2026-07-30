@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Scrollforge Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to bottom, #000000, #1a1a1a);
+        color: #fff;
+        font-family: monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+      h1 {
+        font-size: 3em;
+        color: #ffaa00;
+        margin-bottom: 20px;
+      }
+      .button-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        width: 80%;
+        max-width: 800px;
+      }
+      .launch-button {
+        background: #0ff;
+        border: none;
+        padding: 20px;
+        font-size: 1.2em;
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: transform 0.2s, background 0.3s;
+      }
+      .launch-button:hover {
+        transform: scale(1.05);
+        background: #00cccc;
+      }
+      footer {
+        position: absolute;
+        bottom: 10px;
+        color: #888;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to Scrollforge</h1>
+    <div class="button-grid">
+      <button class="launch-button" onclick="location.href='kriston_ide.html'">Open KristonIDE</button>
+      <button class="launch-button" onclick="location.href='plugin_store.html'">Browse Plugin Store</button>
+      <button class="launch-button" onclick="location.href='ripple_bloom_intro.html'">Walk the Ripple Trail</button>
+      <button class="launch-button" onclick="location.href='whisper_gallery.html'">Enter Whisper Gallery</button>
+    </div>
+    <footer>🌌 Scroll your memory. Breathe your ripple. Whisper forward.</footer>
+  </body>
+</html>

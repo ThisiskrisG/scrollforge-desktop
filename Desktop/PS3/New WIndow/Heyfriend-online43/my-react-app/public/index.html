@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Social Media App</title>
+
+
+
+  <!-- Add Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- Add your custom style file -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Add cross-origin isolation headers -->
+  <meta http-equiv="content-security-policy" content="same-origin require-corp">
+
+  <!-- Remove type="module" attribute -->
+  <script crossorigin="use-credentials" src="script.mjs"></script>
+
+  <!-- Add the modified script block here -->
+  <script>
+    // Existing functions...
+
+    function createPost(event) {
+      event.preventDefault();
+
+      // Get the values from the form
+      const postTitle = document.getElementById('postTitle').value;
+      const postContent = document.getElementById('postContent').value;
+
+      // Create a new post element
+      const newPost = document.createElement('div');
+      newPost.innerHTML = `
+                <h3>${postTitle}</h3>
+                <p>${postContent}</p>
+                <hr>
+            `;
+
+      // Append the new post to the Home section
+      const homeSection = document.getElementById('homeSection');
+      homeSection.appendChild(newPost);
+
+      // Clear the form
+      document.getElementById('postForm').reset();
+    }
+  </script>
+</head>
+<body>
+
+<!-- Your existing HTML content -->
+
+</body>
+</html>
+
+
+<header class="container mt-4">
+  <h1>Your Social Media</h1>
+</header>
+
+<</header>
+
+<nav class="container">
+  <a href="#" onclick="toggleSection('homeSection')">Home</a> |
+  <a href="#" onclick="toggleSection('profileSection')">Profile</a> |
+  <a href="#" onclick="toggleSection('postFeedSection')">Post Feed</a> |
+  <a href="#" onclick="toggleSection('friendSection')">Friends</a> |
+  <a href="#" onclick="toggleSection('messagesSection')">Messages</a> |
+  <a href="#" onclick="toggleSection('settingsSection')">Settings</a> |
+  <a href="#" onclick="toggleSection('browseSection')">Browse</a> <!-- New Browse Section -->
+</nav>
+<main class="container">
+  <!-- Home Section -->
+
+  </nav>
+  <main class="container">
+    <!-- Home Section -->
+    <section id="homeSection" style="display: none;">
+      <h2>Home Section Content</h2>
+      <!-- Add your home content here -->
+    </section>
+
+    <!-- Add this HTML structure where you want to display the Browse section -->
+    <section id="browseSection" style="display: none;">
+      <h2>Browse Section</h2>
+      <div id="browseContainer"></div>
+    </section>
+
+
+    <main class="container">
+      <!-- Your existing sections -->
+
+      <main class="container">
+        <!-- Your existing sections -->
+
+        <!-- Logo Section -->
+        <section id="logoSection" class="text-center">
+          <img src="path/to/your/logo1.jpg" alt="Logo" class="centered-logo">
+        </section>
+      </main>
+
+
+
+
+      <!-- Profile Section -->
+      <section id="profileSection" style="display: none;">
+        <h2>Your Profile</h2>
+        <div id="profilePictureContainer">
+          <img id="profilePicture" alt="Profile Picture" style="max-width: 200px; max-height: 200px;">
+        </div>
+        <p id="bioDescription">Bio Description: This is your bio description.</p>
+        <p id="userAge">Age: 25</p> <!-- Add this line for displaying age -->
+
+        <label for="newBioDescription">Update Bio Description:</label>
+        <input type="text" id="newBioDescription" name="newBioDescription">
+        <br>
+
+        <label for="newUserAge">Update Age:</label> <!-- Add this line for updating age -->
+        <input type="number" id="newUserAge" name="newUserAge">
+        <br>
+
+        <label for="profilePictureUpload">Upload Profile Picture:</label>
+        <input type="file" accept="image/*" id="profilePictureUpload" name="profilePictureUpload" onchange="previewProfilePicture(event)">
+        <br>
+
+        <button onclick="updateProfile()">Update Profile</button>
+      </section>
+
+      <!-- Post Feed Section -->
+      <section id="postFeedSection" style="display: none;">
+        <h2>Post Feed Section</h2>
+        <h2>Create a New Post</h2>
+        <!-- Add a form for creating posts -->
+        <form id="postForm" onsubmit="createPost(event)">
+          <label for="postTitle">Title:</label>
+          <input type="text" id="postTitle" name="postTitle" required>
+
+          <label for="postContent">Content:</label>
+          <textarea id="postContent" name="postContent" rows="4" required></textarea>
+          <button type="submit">Post</button>
+        </form>
+      </section>
+
+      <!-- Friends List Section -->
+      <section id="friendSection" style="display: none;">
+        <h2>Your Friends</h2>
+        <div>
+          <ul id="friendsList">
+            <!-- Friends list will be dynamically populated here -->
+            <li>Friend 1</li>
+            <li>Friend 2</li>
+            <li>Friend 3</li>
+            <!-- Add more list items as needed -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- Messages Section -->
+      <section id="messagesSection" style="display: none;">
+        <h2>Messages Section</h2>
+        <div id="messageContainer">
+          <!-- Messages will be dynamically populated here -->
+        </div>
+        <form onsubmit="sendMessage(event)">
+          <label for="messageText">Type your message:</label>
+          <textarea id="messageText" name="messageText" rows="4" required></textarea>
+          <button type="submit">Send Message</button>
+        </form>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settingsSection" style="display: none;">
+        <h2>Settings</h2>
+
+        <!-- Deactivate Account -->
+        <button onclick="deactivateAccount()">Deactivate Account</button>
+
+        <!-- Delete Friends -->
+        <button onclick="deleteFriends()">Delete Friends</button>
+      </section>
+    </main>
+
+
+    <script>
+      function deactivateAccount() {
+        // Add logic to deactivate the account
+        alert("Account deactivated!");
+      }
+
+      function deleteFriends() {
+        // Add logic to delete friends
+        alert("Friends deleted!");
+      }
+    </script>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="../path/to/your/script.mjs"></script>
+
+  <script>
+
+
+    function toggleSection(sectionId) {
+      // Hide all sections
+      document.querySelectorAll('main section').forEach(section => {
+        section.style.display = 'none';
+      });
+
+      // Show the clicked section
+      const clickedSection = document.getElementById(sectionId);
+      if (clickedSection) {
+        clickedSection.style.display = 'block';
+      }
+    }
+
+    function previewProfilePicture(event) {
+      const input = event.target;
+      const preview = document.getElementById('profilePicture');
+      const file = input.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateProfile() {
+      const newBioDescription = document.getElementById('newBioDescription').value;
+      const profilePictureUpload = document.getElementById('profilePictureUpload');
+      const newProfilePicture = profilePictureUpload.files[0];
+
+      // Update bio description and profile picture
+      document.getElementById('bioDescription').innerText = `Bio Description: ${newBioDescription}`;
+      if (newProfilePicture) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById('profilePicture').src = e.target.result;
+        };
+        reader.readAsDataURL(newProfilePicture);
+      }
+
+      // You can add logic here to send the updated profile information to your server.
+
+    }
+
+    <!-- Add this script section after the existing scripts -->
+
+
+    // Function to update the Friends list
+    function updateFriendsList(friends) {
+      const friendsList = document.getElementById('friendsList');
+      friendsList.innerHTML = ''; // Clear existing list items
+
+      friends.forEach(friend => {
+        const listItem = document.createElement('li');
+        listItem.textContent = friend;
+        friendsList.appendChild(listItem);
+      });
+    }
+
+  </script>
+
+  </body>
+  </html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Creator Mode - Voice & Media</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="dashboard">
+    <h2>🎙️ Creator Mode Live</h2>
+    <div class="video-section">
+      <video id="localVideo" autoplay muted></video>
+    </div>
+    <div class="controls">
+      <button id="startButton">Start Sharing</button>
+      <button id="stopButton" disabled>Stop</button>
+      <div id="micLevel"><div id="levelBar"></div></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

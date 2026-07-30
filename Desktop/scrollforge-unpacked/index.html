@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scrollforge IDE - Standard</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Segoe UI,sans-serif; background:#1e1e1e; color:#d4d4d4; height:100vh; overflow:hidden; }
+    header { background:#252526; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; }
+    .logo { font-size:26px; font-weight:bold; color:#00bfff; }
+    #layout { display:flex; height:calc(100vh - 52px); }
+    #sidebar { width:240px; background:#252526; padding:15px; border-right:1px solid #333; overflow-y:auto; }
+    #main { flex:1; display:flex; flex-direction:column; }
+    .CodeMirror { height:100% !important; }
+    #preview { flex:1; border-top:1px solid #333; background:#fff; }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+</head>
+<body>
+  <header>
+    <div class="logo">🌀 Scrollforge IDE</div>
+    <div>
+      <button onclick="runCode()">▶ Run</button>
+    </div>
+  </header>
+
+  <div id="layout">
+    <div id="sidebar">
+      <h3>📁 Files</h3>
+      <ul id="file-list">
+        <li onclick="loadFile('index.html')">index.html</li>
+        <li onclick="loadFile('main.js')">main.js</li>
+        <li onclick="loadFile('main.py')">main.py</li>
+        <li onclick="loadFile('main.rb')">main.rb</li>
+        <li onclick="loadFile('main.rb')">main.rb</li>
+      </ul>
+    </div>
+    <div id="main">
+      <div id="editor-container" style="flex:1"><textarea id="editor"></textarea></div>
+      <iframe id="preview" style="flex:1;border:none"></iframe>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/ruby/ruby.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/ruby/ruby.min.js"></script>
+
+  <script>
+    let editor;
+
+    window.onload = () => {
+      editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+        lineNumbers: true,
+        mode: 'htmlmixed',
+        theme: 'dracula'
+      });
+      loadFile('main.py');
+    };
+
+    function loadFile(name) {
+      let code = '';
+      if (name === 'main.rb') {
+        code = `puts "Hello from Scrollforge!"`;
+        editor.setOption('mode', 'ruby');
+      } else if (name === 'main.py') {
+        code = `print("Hello from Scrollforge!")`;
+        editor.setOption('mode', 'python');
+      } else if (name === 'main.js') {
+        code = `console.log("Hello from JavaScript!");`;
+        editor.setOption('mode', 'javascript');
+      } else {
+        code = '<h1>Hello from Scrollforge!</h1>';
+        editor.setOption('mode', 'htmlmixed');
+      }
+      editor.setValue(code);
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const iframe = document.getElementById('preview');
+      const doc = iframe.contentDocument;
+      doc.open();
+      doc.write(editor.getValue());
+      doc.close();
+    }
+
+    function runCode() { updatePreview(); }
+  </script>
+</body>
+</html>
+
+

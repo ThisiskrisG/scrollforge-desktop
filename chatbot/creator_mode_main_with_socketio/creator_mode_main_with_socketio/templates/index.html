@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Creator Mode Live</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Live Users</h1>
+    <ul id="userList"></ul>
+
+    <script>
+        var socket = io();
+
+        socket.on('user_list', function(users) {
+            const ul = document.getElementById('userList');
+            ul.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.innerHTML = `<img src="${user.avatar}" width="30" height="30"> ${user.username}`;
+                ul.appendChild(li);
+            });
+        });
+
+        // Example profile update
+        socket.emit('update_profile', {
+            username: "CreatorUser",
+            avatar: "https://via.placeholder.com/30"
+        });
+    </script>
+</body>
+</html>

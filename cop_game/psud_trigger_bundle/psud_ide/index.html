@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Psud IDE – Triggers</title>
+  <style>
+    body { margin: 0; background: #111; overflow: hidden; }
+    #grid {
+      width: 640px; height: 480px;
+      margin: 0 auto; position: relative;
+      background: #222;
+    }
+    .orb { border-radius: 50%; background: #0ff; }
+    .spike { border-radius: 0; background: #f00; }
+    .enemy { border-radius: 50%; background: #0f0; }
+  </style>
+</head>
+<body>
+  <div id="grid"></div>
+  <script>
+window.addEventListener("load", () => {
+  const grid = document.getElementById("grid");
+  const TILE_SIZE = 32;
+  const GROUND_LEVEL = 12;
+  const WALL_LEFT = 0;
+  const WALL_RIGHT = 19;
+  const tiles = {};
+  const physics = {};
+  const collisions = [];
+  const triggers = [];
+
+  function spawnObject(id, x, y, type = "orb") {
+    const obj = document.createElement("div");
+    obj.className = type;
+    obj.style.position = "absolute";
+    obj.style.left = x * TILE_SIZE + "px";
+    obj.style.top = y * TILE_SIZE + "px";
+    obj.style.width = TILE_SIZE + "px";
+    obj.style.height = TILE_SIZE + "px";
+    obj.style.background = type === "spike" ? "#f00" : type === "enemy" ? "#0f0" : "#0ff";
+    if (type === "spike") obj.style.borderRadius = "0";
+    else obj.style.borderRadius = "50%";
+    obj.dataset.id = id;
+    obj.dataset.type = type;
+    grid.appendChild(obj);
+    tiles[id] = { x, y, type, el: obj };
+  }
+
+  function moveObject(id, dir, dist) {
+    const obj = tiles[id];
+    if (!obj) return;
+    if (dir === "right") obj.x = Math.min(WALL_RIGHT, obj.x + dist);
+    if (dir === "left") obj.x = Math.max(WALL_LEFT, obj.x - dist);
+    if (dir === "down") obj.y += dist;
+    if (dir === "up") obj.y -= dist;
+    obj.el.style.left = obj.x * TILE_SIZE + "px";
+    obj.el.style.top = obj.y * TILE_SIZE + "px";
+  }
+
+  function enableGravity(id) {
+    const obj = tiles[id];
+    if (!obj) return;
+    physics[id] = { vy: 0, vx: 0, bounce: 0 };
+  }
+
+  function setBounce(id, val) {
+    if (physics[id]) physics[id].bounce = val;
+  }
+
+  function setVelocity(id, vx, vy) {
+    if (!physics[id]) return;
+    physics[id].vx = vx;
+    physics[id].vy = vy;
+  }
+
+  function checkCollisions() {
+    Object.keys(tiles).forEach(id1 => {
+      const a = tiles[id1];
+      Object.keys(tiles).forEach(id2 => {
+        if (id1 === id2) return;
+        const b = tiles[id2];
+        if (Math.round(a.x) === Math.round(b.x) && Math.round(a.y) === Math.round(b.y)) {
+          collisions.forEach(c => {
+            if (c.a === a.type && c.b === b.type) {
+              if (c.action === "remove") {
+                a.el.remove();
+                delete tiles[id1];
+                delete physics[id1];
+              } else if (c.action === "change_color") {
+                a.el.style.background = c.value;
+              } else if (c.action === "play_sound") {
+                const audio = new Audio("hit.wav");
+                audio.play();
+              }
+            }
+          });
+        }
+      });
+    });
+  }
+
+  function applyPhysics() {
+    for (let id in physics) {
+      const obj = tiles[id];
+      if (!obj) continue;
+      const p = physics[id];
+      p.vy += 0.5;
+      obj.x += p.vx * 0.1;
+      obj.y += p.vy * 0.1;
+
+      if (obj.x < WALL_LEFT) {
+        obj.x = WALL_LEFT;
+        p.vx *= -p.bounce;
+      }
+      if (obj.x > WALL_RIGHT) {
+        obj.x = WALL_RIGHT;
+        p.vx *= -p.bounce;
+      }
+
+      if (obj.y >= GROUND_LEVEL) {
+        obj.y = GROUND_LEVEL;
+        p.vy *= -p.bounce;
+        if (Math.abs(p.vy) < 0.1) p.vy = 0;
+      }
+
+      obj.el.style.left = obj.x * TILE_SIZE + "px";
+      obj.el.style.top = obj.y * TILE_SIZE + "px";
+    }
+
+    checkCollisions();
+  }
+
+  function runTimedTriggers() {
+    const now = Date.now();
+    triggers.forEach(trigger => {
+      if (!trigger.fired && now >= trigger.time) {
+        trigger.fired = true;
+        if (trigger.cmd === "spawn") {
+          spawnObject(trigger.id, trigger.x, trigger.y);
+        }
+      }
+    });
+  }
+
+  setInterval(() => {
+    applyPhysics();
+    runTimedTriggers();
+  }, 100);
+
+  function runPsudScroll() {
+    const scroll = localStorage.getItem("psud_scroll_run");
+    if (!scroll) return;
+
+    const lines = scroll.split("\n");
+    for (let line of lines) {
+      if (line.includes("spawn")) {
+        const match = line.match(/spawn\s+"(\w+)" at (\d+) (\d+)(?: type "(\w+)")?/);
+        if (match) {
+          const type = match[4] || "orb";
+          spawnObject(match[1], parseInt(match[2]), parseInt(match[3]), type);
+        }
+      } else if (line.includes("move")) {
+        const match = line.match(/move\s+"(\w+)" (\w+) (\d+)/);
+        if (match) {
+          moveObject(match[1], match[2], parseInt(match[3]));
+        }
+      } else if (line.includes("physics") && line.includes("gravity")) {
+        const match = line.match(/physics\s+"(\w+)" gravity on/);
+        if (match) enableGravity(match[1]);
+      } else if (line.includes("physics") && line.includes("bounce")) {
+        const match = line.match(/physics\s+"(\w+)" bounce ([0-9.]+)/);
+        if (match) setBounce(match[1], parseFloat(match[2]));
+      } else if (line.includes("velocity")) {
+        const match = line.match(/velocity\s+"(\w+)" (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/);
+        if (match) setVelocity(match[1], parseFloat(match[2]), parseFloat(match[3]));
+      } else if (line.includes("on_collide")) {
+        if (line.includes("change_color")) {
+          const match = line.match(/on_collide "(\w+)" with "(\w+)" change_color "(\w+)" "([^"]+)"/);
+          if (match) {
+            collisions.push({ a: match[1], b: match[2], action: "change_color", value: match[4] });
+          }
+        } else if (line.includes("play_sound")) {
+          const match = line.match(/on_collide "(\w+)" with "(\w+)" play_sound "([^"]+)"/);
+          if (match) {
+            collisions.push({ a: match[1], b: match[2], action: "play_sound", value: match[3] });
+          }
+        }
+      } else if (line.includes("after")) {
+        const match = line.match(/after (\d+) seconds spawn "(\w+)" at (\d+) (\d+)/);
+        if (match) {
+          triggers.push({
+            time: Date.now() + parseInt(match[1]) * 1000,
+            cmd: "spawn",
+            id: match[2],
+            x: parseInt(match[3]),
+            y: parseInt(match[4]),
+            fired: false
+          });
+        }
+      }
+    }
+
+    localStorage.removeItem("psud_scroll_run");
+  }
+
+  setInterval(runPsudScroll, 500);
+});
+</script>
+</body>
+</html>

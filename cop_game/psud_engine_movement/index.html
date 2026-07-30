@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Psud Engine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Psud Engine - Grid Runner</h1>
+  <div id="container">
+    <canvas id="gameCanvas" width="320" height="320"></canvas>
+    <div id="editor">
+      <select id="assetSelector">
+        <option value="empty">Empty</option>
+        <option value="player">Player</option>
+        <option value="coin">Coin</option>
+        <option value="wall">Wall</option>
+      </select>
+      <button onclick="saveScene()">Save Scene</button>
+      <button onclick="runScene()">Run</button>
+      <pre id="consoleOutput"></pre>
+    </div>
+  </div>
+  <script src="engine.js"></script>
+  <script src="ide/editor.js"></script>
+</body>
+</html>

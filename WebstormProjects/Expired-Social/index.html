@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Social Media App</title>
+
+
+    </script>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Add your custom style file -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Add cross-origin isolation headers -->
+    <meta http-equiv="content-security-policy" content="same-origin require-corp">
+
+
+
+
+    <script>
+        // Example usage of the functions
+        const userProfile = getUserProfile("exampleUser");
+        const browseSections = getAllBrowseSections();
+
+        // Display the data on the page (replace with your actual UI update logic)
+        document.getElementById("userProfile").innerText = JSON.stringify(userProfile, null, 2);
+        document.getElementById("browseSections").innerText = JSON.stringify(browseSections, null, 2);
+    </script>
+    </body>
+
+
+</head>
+<body>
+
+<header class="container mt-4">
+    <h1>Your Social Media</h1>
+</header>
+
+<nav class="container">
+    <a href="#" onclick="toggleSection('homeSection')">Home</a> |
+    <a href="#" onclick="toggleSection('profileSection')">Profile</a> |
+    <a href="#" onclick="toggleSection('postFeedSection')">Post Feed</a> |
+    <a href="#" onclick="toggleSection('friendSection')">Friends</a> |
+    <a href="#" onclick="toggleSection('messagesSection')">Messages</a> |
+    <a href="#" onclick="toggleSection('settingsSection')">Settings</a> |
+    <a href="#" onclick="toggleSection('browseSection')">Browse</a> <!-- New Browse Section -->
+</nav>
+
+<main class="container">
+
+    <section id="homeSection" style="display: none;">
+        <h2>Home Section Content</h2>
+        <div id="postContainer"></div>
+    </section>
+
+    <!-- Browse Section -->
+    <section id="browseSection" style="display: none;">
+        <h2>Browse Section</h2>
+        <div id="browseContainer"></div>
+    </section>
+
+    <section id="friendSection" style="display: none;">
+        <h2>Your Friends</h2>
+        <div id="friendsListContainer">
+            <ul id="friendsList">
+                <!-- Friends list will be dynamically populated here -->
+            </ul>
+        </div>
+    </section>
+    <section id="profileSection" style="display: none;">
+        <h2>Your Profile</h2>
+        <div id="profilePictureContainer">
+            <img id="profilePicture" alt="Profile Picture" style="max-width: 200px; max-height: 200px;">
+        </div>
+        <p id="currentUsername">Username: <span id="displayedUsername">ExampleUser</span></p>
+        <label for="newUsername">Update Username:</label>
+        <input type="text" id="newUsername" name="newUsername">
+        <br>
+
+        <p id="userAge">Age: 25</p> <!-- Add this line for displaying age -->
+
+        <label for="newBioDescription">Update Bio Description:</label>
+        <input type="text" id="newBioDescription" name="newBioDescription">
+        <br>
+
+        <label for="newUserAge">Update Age:</label> <!-- Add this line for updating age -->
+        <input type="number" id="newUserAge" name="newUserAge">
+        <br>
+
+        <label for="profilePictureUpload">Upload Profile Picture:</label>
+        <input type="file" accept="image/*" id="profilePictureUpload" name="profilePictureUpload" onchange="previewProfilePicture(event)">
+        <br>
+
+        <button onclick="updateProfile()">Update Profile</button>
+    </section>
+
+    <!-- Browse Section -->
+    <section id="browseSection" style="display: none;">
+        <h2>Browse Section</h2>
+        <div id="browseContainer"></div>
+    </section>
+
+    <section id="friendSection" style="display: none;">
+        <h2>Your Friends</h2>
+        <div id="friendsListContainer">
+            <ul id="friendsList">
+                <!-- Friends list will be dynamically populated here -->
+            </ul>
+        </div>
+    </section>
+
+
+    <section id="messagesSection" style="display: none;">
+        <h2>Messages Section</h2>
+        <div id="messageContainer">
+            <!-- Messages will be dynamically populated here -->
+        </div>
+        <div>
+            <label for="searchUsername">Search for user:</label>
+            <input type="text" id="searchUsername" name="searchUsername" oninput="searchUsers(event)">
+            <ul id="searchResults"></ul>
+        </div>
+        <form onsubmit="sendMessage(event)">
+            <label for="messageText">Type your message:</label>
+            <textarea id="messageText" name="messageText" rows="4" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </section>
+
+    <section id="settingsSection" style="display: none;">
+        <!-- Content specific to the settings section goes here -->
+        <button onclick="logout()">Log Out</button>
+    </section>
+
+    <section id="postFeedSection" style="display: none;">
+        <h2>Post Feed Section</h2>
+        <h2>Create a New Post</h2>
+        <!-- Add a form for creating posts -->
+        <form id="postForm" onsubmit="createPost(event)">
+            <label for="postTitle">Title:</label>
+            <input type="text" id="postTitle" name="postTitle" required>
+
+            <label for="postContent">Content:</label>
+            <textarea id="postContent" name="postContent" rows="4" required></textarea>
+            <button type="submit">Post</button>
+        </form>
+    </section>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script src="../path/to/your/script.mjs"></script>
+
+<script>
+    let profileUpdated = false;
+
+    function createPost(event) {
+        event.preventDefault();
+
+        // Get the values from the form
+        const postTitle = document.getElementById('postTitle').value;
+        const postContent = document.getElementById('postContent').value;
+
+        // Create a unique identifier for the post
+        const postId = `post_${Date.now()}`;
+
+        // Create a new post element
+        const newPost = document.createElement('div');
+        newPost.id = postId;
+        newPost.innerHTML = `
+            <h3>${postTitle}</h3>
+            <p>${postContent}</p>
+            <hr>
+        `;
+
+        // Append the new post to the Post Feed section
+        const postContainer = document.getElementById('postContainer');
+        postContainer.appendChild(newPost);
+
+        // Clear the form
+        document.getElementById('postForm').reset();
+
+        // Notify user about the new post
+        alert('Post created successfully!');
+    }
+
+    // Example definition for updateUsernameInContainer
+    function updateUsernameInContainer(container, newUsername) {
+        const usernameElements = container.querySelectorAll('.username-placeholder');
+        usernameElements.forEach(element => {
+            element.innerText = newUsername;
+        });
+    }
+
+    // Your existing code
+    function updateProfile() {
+        if (profileUpdated) {
+            console.log("Profile already updated.");
+            return;
+        }
+
+        const newBioDescription = document.getElementById('newBioDescription').value;
+        const profilePictureUpload = document.getElementById('profilePictureUpload');
+        const newProfilePicture = profilePictureUpload.files[0];
+        const newUsername = document.getElementById('newUsername').value;
+
+        // Update displayed username in profile section
+        document.getElementById('displayedUsername').innerText = newUsername;
+
+        // Update displayed username in browse section
+        const browseContainer = document.getElementById('browseContainer');
+        updateUsernameInContainer(browseContainer, newUsername);
+
+        // Update displayed username in friends section
+        const friendsList = document.getElementById('friendsList');
+        updateUsernameInContainer(friendsList, newUsername);
+
+        // Update bio description
+        document.getElementById('bioDescription').innerText = `Bio Description: ${newBioDescription}`;
+
+        // Update profile picture preview
+        if (newProfilePicture) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imageSrc = e.target.result;
+                updateProfilePicturePreview(imageSrc);
+
+                // Add the new user profile to the Browse Section
+                addUserToBrowseSection({
+                    username: newUsername,
+                    profilePicture: imageSrc,
+                });
+
+                // Set the flag to indicate that the profile has been updated
+                profileUpdated = true;
+            };
+            reader.readAsDataURL(newProfilePicture);
+        }
+    }
+
+
+    function updateProfilePicturePreview(imageSrc) {
+        const profilePicture = document.getElementById('profilePicture');
+        profilePicture.src = imageSrc;
+    }
+
+    function previewProfilePicture(event) {
+        const input = event.target;
+        const file = input.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imageSrc = e.target.result;
+                updateProfilePicturePreview(imageSrc);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function searchUsers(event) {
+        const searchInput = event.target.value.toLowerCase();
+        const browseContainer = document.getElementById('browseContainer');
+        const searchResults = document.getElementById('searchResults');
+        searchResults.innerHTML = ''; // Clear existing search results
+
+        userProfiles.forEach(user => {
+            const username = user.username.toLowerCase();
+            if (username.includes(searchInput)) {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <img src="${user.profilePicture}" alt="${user.username} Profile">
+                    <p>${user.username}</p>
+                    <button onclick="startConversation('${user.username}')">Message</button>
+                `;
+                searchResults.appendChild(listItem);
+            }
+        });
+    }
+
+    function startConversation(username) {
+        // Logic to start a conversation with the selected user
+        // You can open the Messages section and update UI accordingly
+        toggleSection('messagesSection');
+        // Additional logic as needed
+    }
+
+    function addFriend(username, profilePicture) {
+        // Update the friends list
+        const friendsList = document.getElementById('friendsList');
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+        <img src="${profilePicture}" alt="${username} Profile" style="max-width: 50px; max-height: 50px;">
+        <p>${username}</p>
+    `;
+        friendsList.appendChild(listItem);
+
+        // You can also add additional logic to store the friend information or perform other actions.
+
+        // Remove the added friend from the Browse section
+        removeFriendFromBrowse(username);
+    }
+
+
+
+    function logout() {
+        // Clear user data from local storage
+        localStorage.removeItem('user');
+
+        // Redirect to the login page or another appropriate page after logging out
+        window.location.href = 'login.html';
+    }
+
+    function addUserToBrowseSection(user) {
+        const browseContainer = document.getElementById('browseContainer');
+        const profileCard = document.createElement('div');
+        profileCard.innerHTML = `
+        <img src="${user.profilePicture}" alt="${user.username} Profile" class="browse-profile-picture-small">
+        <p>${user.username}</p>
+        <button onclick="addFriend('${user.username}', '${user.profilePicture}')">Add Friend</button>
+    `;
+        browseContainer.appendChild(profileCard);
+    }
+
+
+    function toggleSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll('main section').forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // Show the clicked section
+        const clickedSection = document.getElementById(sectionId);
+        if (clickedSection) {
+            clickedSection.style.display = 'block';
+        }
+    }
+
+    // Your existing script content
+
+</script>
+
+</body>
+</html>
+

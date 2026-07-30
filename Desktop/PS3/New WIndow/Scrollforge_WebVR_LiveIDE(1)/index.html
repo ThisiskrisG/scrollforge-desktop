@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Scrollforge VR Portfolio</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <style>
+      #loader {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #111;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0ff;
+        font-family: monospace;
+        font-size: 1.5em;
+        z-index: 9999;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loader">🌌 Scrollforge is forming…</div>
+
+    <a-scene background="color: #111" loading-screen="enabled: false"
+             onloaded="startWhisper(); document.getElementById('loader').style.display='none';">
+
+      <a-assets>
+        <audio id="whisper1" src="whisper_1.mp3"></audio>
+        <audio id="whisper2" src="whisper_2.mp3"></audio>
+        <audio id="whisper3" src="whisper_3.mp3"></audio>
+        <audio id="whisper4" src="whisper_4.mp3"></audio>
+      </a-assets>
+
+      <a-entity id="whisper" sound="autoplay: false; volume: 0.6"></a-entity>
+
+      <script>
+        function startWhisper() {
+          const whisper = document.querySelector('#whisper');
+          const choices = ['#whisper1', '#whisper2', '#whisper3', '#whisper4'];
+          const choice = choices[Math.floor(Math.random() * choices.length)];
+          whisper.setAttribute('sound', 'src', choice);
+          whisper.components.sound.playSound();
+        }
+
+        function activateOrbFeedback() {
+          const orb = document.querySelector('#echo-orb');
+          const text = document.querySelector('#orb-feedback');
+          orb.setAttribute('color', '#ffaa00');
+          text.setAttribute('value', '🌀 Memory opening…');
+          setTimeout(() => {
+            window.location.href = 'ripple_branch.html';
+          }, 1500);
+        }
+
+        function showGlow(id, visible) {
+          document.querySelector(id).setAttribute('visible', visible);
+        }
+      </script>
+
+      <a-entity camera position="0 1.6 0" look-controls wasd-controls></a-entity>
+      <a-entity light="type: ambient; color: #ccc"></a-entity>
+
+      <!-- Echo Orb -->
+      <a-entity position="-4 1.5 -5" 
+                event-set__enter="_event: mouseenter; _target: #glow-echo; visible: true"
+                event-set__leave="_event: mouseleave; _target: #glow-echo; visible: false">
+        <a-sphere id="echo-orb" radius="0.6" color="#00ffff" onclick="activateOrbFeedback()">
+          <a-text value="Echo Quest" align="center" position="0 1 -0.1" color="#ccc" width="3"></a-text>
+        </a-sphere>
+        <a-ring id="glow-echo" position="0 0 0" radius-inner="0.65" radius-outer="0.75"
+                color="#00ffff" rotation="-90 0 0" visible="false"
+                material="shader: flat; opacity: 0.5;"></a-ring>
+      </a-entity>
+      <a-text id="orb-feedback" value="" position="-4 2.6 -5" color="#fff" align="center" width="4"></a-text>
+
+      <!-- KristonIDE Orb -->
+      <a-entity position="0 1.5 -5"
+                event-set__enter="_event: mouseenter; _target: #glow-ide; visible: true"
+                event-set__leave="_event: mouseleave; _target: #glow-ide; visible: false">
+        <a-sphere radius="0.6" color="#ffaa00" onclick="window.location.href='kriston_ide.html'">
+          <a-text value="KristonIDE" align="center" position="0 1 -0.1" color="#ccc" width="3"></a-text>
+        </a-sphere>
+        <a-ring id="glow-ide" position="0 0 0" radius-inner="0.65" radius-outer="0.75"
+                color="#ffaa00" rotation="-90 0 0" visible="false"
+                material="shader: flat; opacity: 0.5;"></a-ring>
+      </a-entity>
+
+      <!-- Whisper Gallery Orb -->
+      <a-entity position="4 1.5 -5"
+                event-set__enter="_event: mouseenter; _target: #glow-gallery; visible: true"
+                event-set__leave="_event: mouseleave; _target: #glow-gallery; visible: false">
+        <a-sphere radius="0.6" color="#ff00ff" onclick="window.location.href='whisper_gallery.html'">
+          <a-text value="Whisper Gallery" align="center" position="0 1 -0.1" color="#ccc" width="3"></a-text>
+        </a-sphere>
+        <a-ring id="glow-gallery" position="0 0 0" radius-inner="0.65" radius-outer="0.75"
+                color="#ff00ff" rotation="-90 0 0" visible="false"
+                material="shader: flat; opacity: 0.5;"></a-ring>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>

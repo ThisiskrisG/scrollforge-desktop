@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Psud Game Dashboard</title>
+    <style>
+        body {
+            background-color: #111;
+            color: #0ff;
+            font-family: monospace;
+            text-align: center;
+            padding-top: 60px;
+        }
+        a {
+            color: #0ff;
+            font-size: 16px;
+            text-decoration: none;
+            border: 2px solid #0ff;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Welcome, {{ user.username }}!</h1>
+    <p><a href="/download_game">Download Psud Game</a></p>
+    <p><a href="/api/maps" target="_blank">View Map JSON</a></p>
+</body>
+</html>

@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>KristonIDE</title>
+  <style>
+    body { background: #1a1a1a; color: white; font-family: monospace; padding: 20px; }
+    textarea { width: 100%; height: 300px; background: #111; color: #0f0; font-size: 16px; }
+    select, button { margin-top: 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h2>🧠 KristonIDE</h2>
+  <label>Scroll:</label>
+  <select id="scrolls" onchange="loadScroll()"></select>
+  <textarea id="editor"></textarea><br>
+  <button onclick="runScroll()">▶ Run Scroll</button>
+  <script>
+    const fs = require('fs');
+    const path = require('path');
+    const scrollFile = path.join(__dirname, '..', 'installed_plugins.json');
+    const dropdown = document.getElementById('scrolls');
+    const editor = document.getElementById('editor');
+
+    function loadInstalledScrolls() {
+      try {
+        const data = JSON.parse(fs.readFileSync(scrollFile));
+        for (const key in data) {
+          const option = document.createElement('option');
+          option.value = key;
+          option.textContent = key;
+          dropdown.appendChild(option);
+        }
+        editor.value = data[dropdown.value];
+      } catch (e) {
+        console.error("Failed to load installed scrolls", e);
+        editor.value = '// No scrolls found';
+      }
+    }
+
+    function loadScroll() {
+      const data = JSON.parse(fs.readFileSync(scrollFile));
+      editor.value = data[dropdown.value];
+    }
+
+    function runScroll() {
+      alert("🌀 Scroll executed: " + editor.value);
+    }
+
+    loadInstalledScrolls();
+  </script>
+</body>
+</html>

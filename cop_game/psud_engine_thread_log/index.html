@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Psud Engine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Psud Engine - Grid Runner</h1>
+  <div id="container">
+    <canvas id="gameCanvas" width="320" height="320"></canvas>
+    <div id="editor">
+      <label for="loadSceneInput">Load Scene</label><br>
+      <input type="file" id="loadSceneInput" accept=".json"><br>
+      <button onclick="loadScene()">Load Scene</button><br>
+      <pre id="consoleOutput"></pre>
+    
+    <h3>📜 Scroll Gallery</h3>
+    
+    <button onclick="toggleLegend()">Toggle Tag Legend</button>
+    <div id="tagLegendPanel" style="display:none; font-size:12px; background:#111; color:#fff; padding:4px; margin-top:4px;">
+      <strong>Legend:</strong><br>
+      C = isCollectible<br>
+      ! = isDangerous<br>
+      P = isPortal
+    </div>
+    <div id="tagFilters" style="margin-top:6px;">
+      <strong>Filter by Tag:</strong><br>
+      <label><input type="checkbox" value="isCollectible" onchange="refreshScrollGallery()"> isCollectible</label><br>
+      <label><input type="checkbox" value="isDangerous" onchange="refreshScrollGallery()"> isDangerous</label><br>
+      <label><input type="checkbox" value="isPortal" onchange="refreshScrollGallery()"> isPortal</label>
+    </div>
+    <div id="scrollGallery" style="max-height:150px; overflow:auto; background:#222; color:white; padding:5px; font-size: 12px;"></div>
+    <button onclick="refreshScrollGallery()">Refresh Gallery</button>
+    </div>
+  
+    <h3>📜 Scroll Gallery</h3>
+    
+    <button onclick="toggleLegend()">Toggle Tag Legend</button>
+    <div id="tagLegendPanel" style="display:none; font-size:12px; background:#111; color:#fff; padding:4px; margin-top:4px;">
+      <strong>Legend:</strong><br>
+      C = isCollectible<br>
+      ! = isDangerous<br>
+      P = isPortal
+    </div>
+    <div id="tagFilters" style="margin-top:6px;">
+      <strong>Filter by Tag:</strong><br>
+      <label><input type="checkbox" value="isCollectible" onchange="refreshScrollGallery()"> isCollectible</label><br>
+      <label><input type="checkbox" value="isDangerous" onchange="refreshScrollGallery()"> isDangerous</label><br>
+      <label><input type="checkbox" value="isPortal" onchange="refreshScrollGallery()"> isPortal</label>
+    </div>
+    <div id="scrollGallery" style="max-height:150px; overflow:auto; background:#222; color:white; padding:5px; font-size: 12px;"></div>
+    <button onclick="refreshScrollGallery()">Refresh Gallery</button>
+    </div>
+  <script src="engine.js"></script>
+  <script src="ide/editor.js"></script>
+</body>
+</html>

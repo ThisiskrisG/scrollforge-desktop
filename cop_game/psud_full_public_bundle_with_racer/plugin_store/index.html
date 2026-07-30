@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Psud Plugin Store</title>
+  <style>
+    body { background: #111; color: #fff; font-family: monospace; padding: 20px; }
+    .plugin { border: 1px solid #555; padding: 10px; margin: 10px; background: #222; }
+    .plugin img { width: 160px; height: 90px; }
+  </style>
+</head>
+<body>
+  <h1>🛒 Psud Plugin Store</h1>
+  <div id="store"></div>
+
+  <script>
+    const plugins = [
+      {
+        name: "Demo Plugin",
+        description: "Spawns a moving orb.",
+        path: "store_plugins/demo_plugin",
+        thumbnail: "store_plugins/demo_plugin/thumbnail.png"
+      },
+      {
+        name: "Color Tag Plugin",
+        description: "Colors tiles by tag.",
+        path: "store_plugins/color_tag_plugin",
+        thumbnail: "store_plugins/color_tag_plugin/thumbnail.png"
+      }
+    ];
+
+    const store = document.getElementById("store");
+    plugins.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "plugin";
+      div.innerHTML = `
+        <h3>${p.name}</h3>
+        <p>${p.description}</p>
+        <img src="${p.thumbnail}" alt="Thumbnail" />
+        <p><code>${p.path}</code></p>
+      `;
+      store.appendChild(div);
+    });
+  </script>
+</body>
+</html>

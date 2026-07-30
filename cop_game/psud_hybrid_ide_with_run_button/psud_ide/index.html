@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Psud IDE - Enemy Scroll</title>
+  <style>
+    body { background: #111; color: white; font-family: monospace; margin: 0; padding: 20px; }
+    h1 { text-align: center; }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(10, 50px);
+      grid-gap: 4px;
+      margin: 20px auto;
+      width: fit-content;
+    }
+    .tile {
+      width: 50px; height: 50px;
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 6px;
+      position: relative;
+    }
+    .enemy {
+      background: crimson;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛠 Psud IDE: Enemy Patrol Test</h1>
+  <div id="grid"></div>
+  <script>
+    const grid = document.getElementById("grid");
+    const tiles = [];
+
+    // Create a 10x5 grid
+    for (let y = 0; y < 5; y++) {
+      for (let x = 0; x < 10; x++) {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.dataset.x = x;
+        tile.dataset.y = y;
+        grid.appendChild(tile);
+        tiles.push(tile);
+      }
+    }
+
+    // Place enemy at x = 3, y = 2
+    let enemyX = 3;
+    const enemyY = 2;
+    function renderEnemy() {
+      tiles.forEach(t => t.classList.remove("enemy"));
+      const tile = tiles.find(t => t.dataset.x == enemyX && t.dataset.y == enemyY);
+      if (tile) tile.classList.add("enemy");
+    }
+
+    // Simulated plugin: patrol 3 left, 3 right
+    function patrol(startX, stepsLeft, stepsRight) {
+      let x = startX;
+      let direction = -1;
+      let steps = 0;
+      let maxSteps = stepsLeft;
+
+      setInterval(() => {
+        x += direction;
+        steps++;
+
+        if (steps >= maxSteps) {
+          direction *= -1;
+          maxSteps = direction === -1 ? stepsLeft : stepsRight;
+          steps = 0;
+        }
+
+        enemyX = x;
+        renderEnemy();
+      }, 600);
+    }
+
+    // Run scroll: attach enemy_logic
+    renderEnemy();
+    patrol(enemyX, 3, 3); // <- loaded from enemy_patrol.scroll
+  </script>
+</body>
+</html>

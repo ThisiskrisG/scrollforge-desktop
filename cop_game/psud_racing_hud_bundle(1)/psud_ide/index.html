@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Psud Engine with HUD</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #111; color: #fff; }
+    #grid {
+      width: 960px; height: 480px;
+      margin: 0 auto; position: relative;
+      background: linear-gradient(to top, #334 0%, #88a 100%);
+    }
+    .object {
+      position: absolute;
+      width: 64px;
+      height: 32px;
+      border-radius: 6px;
+    }
+    .car { background: #0af; z-index: 2; }
+    .boost { background: #0ff; }
+    .fuel { background: #f00; }
+    .lap { background: #fff; width: 32px; height: 96px; top: 192px; }
+
+    #hud {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.6);
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div id="hud">
+    🚗 Lap: <span id="lap">0</span><br/>
+    ⚡ Speed: <span id="speed">0</span><br/>
+    ⛽ Fuel: <span id="fuel">Full</span>
+  </div>
+  <div id="grid"></div>
+  <script>
+    const TILE_SIZE = 32;
+    const grid = document.getElementById("grid");
+    const tiles = {};
+    const physics = {};
+    const events = [];
+    const hud = {{ lap: 0, fuel: "Full", speed: 0 }};
+
+    function spawnObject(id, x, y, type) {
+      const el = document.createElement("div");
+      el.className = "object " + type;
+      el.style.left = x * TILE_SIZE + "px";
+      el.style.top = y * TILE_SIZE + "px";
+      el.dataset.id = id;
+      el.dataset.type = type;
+      grid.appendChild(el);
+      tiles[id] = { id, x, y, el, type };
+    }
+
+    function setVelocity(id, vx, vy) {
+      physics[id] = { vx, vy };
+      if (id === "car") hud.speed = vx;
+    }
+
+    function changeColor(id, color) {
+      const obj = tiles[id];
+      if (obj) obj.el.style.background = color;
+    }
+
+    function applyPhysics() {
+      for (let id in physics) {
+        const obj = tiles[id];
+        const p = physics[id];
+        if (!obj) continue;
+        obj.x += p.vx * 0.1;
+        obj.y += p.vy * 0.1;
+        obj.el.style.left = obj.x * TILE_SIZE + "px";
+        obj.el.style.top = obj.y * TILE_SIZE + "px";
+      }
+    }
+
+    function updateHUD() {
+      document.getElementById("lap").textContent = hud.lap;
+      document.getElementById("speed").textContent = hud.speed.toFixed(1);
+      document.getElementById("fuel").textContent = hud.fuel;
+    }
+
+    function checkCollisions() {
+      for (const e of events) {
+        const a = tiles[e.a], b = tiles[e.b];
+        if (!a || !b) continue;
+        const ax = Math.floor(a.x), ay = Math.floor(a.y);
+        const bx = Math.floor(b.x), by = Math.floor(b.y);
+        if (ax === bx && ay === by) e.action();
+      }
+    }
+
+    setInterval(() => {
+      applyPhysics();
+      checkCollisions();
+      updateHUD();
+    }, 100);
+
+    function runScroll() {
+      const scroll = localStorage.getItem("psud_scroll_run");
+      if (!scroll) return;
+      const lines = scroll.split("\n");
+      for (let line of lines) {
+        if (line.startsWith("spawn")) {
+          const m = line.match(/spawn\s+"(\w+)" at (\d+) (\d+)(?: type "(\w+)")?/);
+          if (m) spawnObject(m[1], parseInt(m[2]), parseInt(m[3]), m[4] || "car");
+        } else if (line.startsWith("velocity")) {
+          const m = line.match(/velocity\s+"(\w+)" (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/);
+          if (m) setVelocity(m[1], parseFloat(m[2]), parseFloat(m[3]));
+        } else if (line.startsWith("change_color")) {
+          const m = line.match(/change_color\s+"(\w+)" "(#\w+)"/);
+          if (m) changeColor(m[1], m[2]);
+        } else if (line.startsWith("on_collide")) {
+          const m = line.match(/on_collide\s+"(\w+)" with "(\w+)" (.+)/);
+          if (m) {
+            const a = m[1], b = m[2], cmd = m[3];
+            events.push({ a, b, action: () => {
+              if (cmd.includes("velocity")) {
+                const vm = cmd.match(/velocity\s+"(\w+)" (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/);
+                if (vm) setVelocity(vm[1], parseFloat(vm[2]), parseFloat(vm[3]));
+              }
+              if (cmd.includes("change_color")) {
+                const cm = cmd.match(/change_color\s+"(\w+)" "(#\w+)"/);
+                if (cm) changeColor(cm[1], cm[2]);
+              }
+              if (cmd.includes("hud_add")) {
+                const hm = cmd.match(/hud_add\s+"(\w+)" (\d+)/);
+                if (hm) hud[hm[1]] += parseInt(hm[2]);
+              }
+            }});
+          }
+        }
+      }
+      localStorage.removeItem("psud_scroll_run");
+    }
+
+    setInterval(runScroll, 500);
+  </script>
+</body>
+</html>

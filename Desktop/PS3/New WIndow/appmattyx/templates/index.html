@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prompt Social</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+      background: #f9f9f9;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .profile {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+    }
+    .profile img {
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+    }
+    .profile-info {
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    form.search-filter {
+      margin-bottom: 25px;
+      display: flex;
+      gap: 10px;
+    }
+    form.search-filter input[type="text"],
+    form.search-filter select {
+      padding: 7px 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      flex: 1;
+    }
+    form.search-filter button {
+      background: #007bff;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    form.search-filter button:hover {
+      background: #0056b3;
+    }
+
+    .prompt {
+      background: white;
+      border-radius: 6px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+    }
+    .prompt-header {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+    .prompt-emoji {
+      font-size: 1.5rem;
+      margin-left: 10px;
+    }
+    .prompt-theme {
+      font-style: italic;
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 3px;
+    }
+
+    /* Pagination styles */
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    .pagination a {
+      margin: 0 8px;
+      text-decoration: none;
+      color: #007bff;
+    }
+    .pagination a:hover {
+      text-decoration: underline;
+    }
+    .pagination .disabled {
+      margin: 0 8px;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Prompt Social</h1>
+    <div class="profile">
+      <img src="{{ user.profile_pic_url }}" alt="{{ user.name }} Profile Picture" />
+      <div class="profile-info">
+        <div><strong>{{ user.name }}</strong></div>
+        <div>Age: {{ user.age }}</div>
+        <div>Location: {{ user.location }}</div>
+      </div>
+    </div>
+  </header>
+
+  <form class="search-filter" method="get" action="{{ url_for('index') }}">
+    <input type="text" name="search" placeholder="Search prompts..." value="{{ search }}">
+    <select name="theme">
+      <option value="">All Themes</option>
+      {% for theme in themes %}
+        <option value="{{ theme }}" {% if theme == theme_filter %}selected{% endif %}>{{ theme }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+
+  {% if prompts %}
+    {% for prompt in prompts %}
+      <div class="prompt">
+        <div class="prompt-header">
+          {{ prompt.text }}
+          {% if prompt.emoji %}
+            <span class="prompt-emoji">{{ prompt.emoji }}</span>
+          {% endif %}
+        </div>
+        {% if prompt.theme %}
+          <div class="prompt-theme">Theme: {{ prompt.theme }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No prompts found.</p>
+  {% endif %}
+
+  <div class="pagination">
+    {% if pagination.has_prev %}
+      <a href="{{ url_for('index', page=pagination.prev_num, search=search, theme=theme_filter) }}">&laquo; Previous</a>
+    {% else %}
+      <span class="disabled">&laquo; Previous</span>
+    {% endif %}
+
+    Page {{ pagination.page }} of {{ pagination.pages }}
+
+    {% if pagination.has_next %}
+      <a href="{{ url_for('index', page=pagination.next_num, search=search, theme=theme_filter) }}">Next &raquo;</a>
+    {% else %}
+      <span class="disabled">Next &raquo;</span>
+    {% endif %}
+  </div>
+
+</body>
+</html>
