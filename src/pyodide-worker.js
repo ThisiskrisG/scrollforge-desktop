@@ -1,5 +1,6 @@
 // Runs as a module worker: new Worker(new URL('./pyodide-worker.js', import.meta.url), { type: 'module' })
-import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.mjs';
+// This worker can load Pyodide either from a locally-cached copy served at /pyodide/
+// (recommended for an Electron packaged app) or fall back to the CDN.
 
 let pyodide = null;
 let initialized = false;
@@ -9,14 +10,30 @@ let lastRunId = 0;
 const MAX_OUTPUT_LENGTH = 200_000; // characters
 const RUN_TIMEOUT_MS = 20_000; // worker-level timeout guard (note: cannot forcibly cancel pyodide run)
 
+async function resolveLoadPyodide() {
+  // Try local copy first (expects public/pyodide/pyodide.mjs to be served at /pyodide/)
+  try {
+    const m = await import('/pyodide/pyodide.mjs');
+    if (m && typeof m.loadPyodide === 'function') {
+      return { loadPyodide: m.loadPyodide, indexURL: '/pyodide/' };
+    }
+  } catch (err) {
+    // local import failed — fall back to CDN
+  }
+
+  // Fallback to CDN
+  const CDN = 'https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.mjs';
+  const m = await import(CDN);
+  return { loadPyodide: m.loadPyodide, indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.3/full/' };
+}
+
 self.addEventListener('message', async (ev) => {
   const msg = ev.data;
   try {
     if (msg.type === 'init') {
       if (!initialized) {
-        pyodide = await loadPyodide({
-          indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.3/full/'
-        });
+        const loader = await resolveLoadPyodide();
+        pyodide = await loader.loadPyodide({ indexURL: loader.indexURL });
         // Example: mount OPFS or pre-load small packages if desired
         initialized = true;
       }
