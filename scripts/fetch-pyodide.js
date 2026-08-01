@@ -54,7 +54,8 @@ function downloadFile(url, destPath) {
 async function fallbackDownload() {
   console.log('wget not found. Falling back to direct downloads of a small set of core files.');
   console.log('This may not include all auxiliary Pyodide files; consider installing wget or using the wget method.');
-  const files = ['pyodide.mjs', 'pyodide.asm.wasm', 'pyodide.wasm.data', 'packages.json'];
+  // Include pyodide.wasm in the fallback list; some Pyodide releases provide a standalone .wasm file instead of asm.wasm/data pairs.
+  const files = ['pyodide.mjs', 'pyodide.wasm', 'pyodide.asm.wasm', 'pyodide.wasm.data', 'packages.json'];
   for (const f of files) {
     const url = BASE_URL + f;
     const dest = path.join(DEST_DIR, f);
