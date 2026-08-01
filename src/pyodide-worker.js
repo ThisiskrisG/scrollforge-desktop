@@ -3,6 +3,7 @@ import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodi
 
 let pyodide = null;
 let initialized = false;
+let lastRunId = 0;
 
 self.addEventListener('message', async (ev) => {
   const msg = ev.data;
@@ -21,12 +22,24 @@ self.addEventListener('message', async (ev) => {
         self.postMessage({ id: msg.id, type: 'error', error: 'Pyodide not initialized' });
         return;
       }
-      // run Python asynchronously and return the result (stringified)
+      // Track the latest run id so we can ignore stale/long-running results.
+      lastRunId = msg.id;
+      const runId = msg.id;
       try {
         const result = await pyodide.runPythonAsync(msg.code);
-        self.postMessage({ id: msg.id, type: 'result', result: String(result) });
+        // only post result if this run is still the latest requested run
+        if (runId === lastRunId) {
+          self.postMessage({ id: msg.id, type: 'result', result: String(result) });
+        } else {
+          // otherwise, ignore stale result
+          // (main thread may have requested a newer run which will produce its own result)
+        }
       } catch (err) {
-        self.postMessage({ id: msg.id, type: 'error', error: String(err) });
+        if (runId === lastRunId) {
+          self.postMessage({ id: msg.id, type: 'error', error: String(err) });
+        } else {
+          // stale error — ignore
+        }
       }
     } else if (msg.type === 'install') {
       // micropip install example (async)

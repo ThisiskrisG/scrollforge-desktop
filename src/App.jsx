@@ -15,36 +15,53 @@ export default function App() {
   const editorRef = useRef(null);
   const editorElRef = useRef(null);
   const workerRef = useRef(null);
+  const [workerReady, setWorkerReady] = useState(false);
+  const pendingRunRef = useRef(null);
   const requestCounter = useRef(0);
   const [output, setOutput] = useState('');
   const [code, setCode] = useState(`# Python example\nprint("hello from pyodide")`);
   const debouncedCode = useDebounced(code, 350);
 
-  // initialize worker
-  useEffect(() => {
-    // module worker so we can import ESM in worker
+  // lazy initialize worker and queue first run if necessary
+  async function initWorker() {
+    if (workerRef.current) return;
     const w = new Worker(new URL('./pyodide-worker.js', import.meta.url), { type: 'module' });
     workerRef.current = w;
     w.onmessage = (e) => {
       const msg = e.data;
       if (msg.type === 'inited') {
         console.log('pyodide inited');
+        setWorkerReady(true);
+        // if there is a pending code run, send it now
+        if (pendingRunRef.current != null) {
+          w.postMessage({ id: ++requestCounter.current, type: 'run', code: pendingRunRef.current });
+          pendingRunRef.current = null;
+        }
       } else if (msg.type === 'result') {
         setOutput(msg.result);
       } else if (msg.type === 'error') {
         setOutput(`Error: ${msg.error}`);
       }
     };
+    // start initialization in worker
     w.postMessage({ id: ++requestCounter.current, type: 'init' });
-
-    return () => {
-      w.terminate();
-    };
-  }, []);
+  }
 
   // run code when debounced value changes
   useEffect(() => {
-    if (!workerRef.current) return;
+    if (!debouncedCode) return;
+    // if worker doesn't exist yet, create it and queue the latest code
+    if (!workerRef.current) {
+      pendingRunRef.current = debouncedCode;
+      initWorker();
+      return;
+    }
+    // worker exists but may not be fully ready (inited)
+    if (!workerReady) {
+      pendingRunRef.current = debouncedCode;
+      return;
+    }
+    // worker ready: send run
     workerRef.current.postMessage({ id: ++requestCounter.current, type: 'run', code: debouncedCode });
   }, [debouncedCode]);
 
@@ -60,7 +77,8 @@ export default function App() {
       minimap: { enabled: false },
       automaticLayout: true
     });
-    editorRef.current.onDidChangeModelContent(() => {
+    // keep disposable so we can dispose on unmount
+    editorRef.current._changeDisposable = editorRef.current.onDidChangeModelContent(() => {
       setCode(editorRef.current.getValue());
     });
   }
@@ -68,12 +86,29 @@ export default function App() {
   // preview iframe update via srcdoc
   const iframeRef = useRef(null);
   useEffect(() => {
-    const doc = iframeRef.current?.contentWindow?.document;
-    if (!doc) return;
-    doc.open();
-    doc.write(`<pre>${escapeHtml(output)}</pre>`);
-    doc.close();
+    if (!iframeRef.current) return;
+    // use srcdoc to update iframe content — avoids document.write and is clearer
+    iframeRef.current.srcdoc = `<pre>${escapeHtml(output)}</pre>`;
   }, [output]);
+
+  // cleanup worker + editor on unmount
+  useEffect(() => {
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+        setWorkerReady(false);
+      }
+      if (editorRef.current) {
+        // dispose content-change listener if we attached it
+        if (editorRef.current._changeDisposable) {
+          editorRef.current._changeDisposable.dispose();
+        }
+        try { editorRef.current.dispose(); } catch (e) {}
+        editorRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
