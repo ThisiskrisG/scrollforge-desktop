@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Preview</title>
+    <style>
+      html,body { height: 100%; margin: 0; }
+      body { font-family: Menlo, Consolas, monospace; padding: 8px; background: #fff; color: #000 }
+      pre { white-space: pre-wrap; word-break: break-word }
+    </style>
+  </head>
+  <body>
+    <pre id="out"></pre>
+    <script>
+      window.addEventListener('message', (ev) => {
+        try {
+          const data = ev.data;
+          if (data && data.type === 'output') {
+            const el = document.getElementById('out');
+            el.textContent = data.output;
+          }
+        } catch (e) {
+          // ignore
+        }
+      });
+      // notify parent that we're ready (optional)
+      try {
+        parent.postMessage({ type: 'preview-ready' }, '*');
+      } catch (e) {}
+    </script>
+  </body>
+</html>
