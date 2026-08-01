@@ -10,18 +10,54 @@ let lastRunId = 0;
 const MAX_OUTPUT_LENGTH = 200_000; // characters
 const RUN_TIMEOUT_MS = 20_000; // worker-level timeout guard (note: cannot forcibly cancel pyodide run)
 
-async function resolveLoadPyodide() {
-  // Try local copy first (expects public/pyodide/pyodide.mjs to be served at /pyodide/)
+async function tryImport(url) {
   try {
-    const m = await import('/pyodide/pyodide.mjs');
+    const m = await import(url);
     if (m && typeof m.loadPyodide === 'function') {
+      return m;
+    }
+  } catch (err) {
+    // ignore and return null so caller can try other options
+  }
+  return null;
+}
+
+async function resolveLoadPyodide() {
+  // 1) Try absolute local path first (served at /pyodide/ when running in dev or a static server)
+  try {
+    const m = await tryImport('/pyodide/pyodide.mjs');
+    if (m) {
       return { loadPyodide: m.loadPyodide, indexURL: '/pyodide/' };
     }
   } catch (err) {
-    // local import failed — fall back to CDN
+    // continue to other strategies
   }
 
-  // Fallback to CDN
+  // 2) If running from file:// (packaged Electron), try resolving pyodide relative to this worker script
+  //    using a few likely relative locations. import.meta.url points to the worker script location.
+  try {
+    if (typeof location !== 'undefined' && location.protocol === 'file:') {
+      const candidates = [
+        // relative to where the worker script is placed inside the app bundle
+        new URL('../public/pyodide/pyodide.mjs', import.meta.url).href,
+        new URL('../../public/pyodide/pyodide.mjs', import.meta.url).href,
+        new URL('./pyodide/pyodide.mjs', import.meta.url).href,
+        new URL('pyodide/pyodide.mjs', import.meta.url).href
+      ];
+      for (const c of candidates) {
+        const m = await tryImport(c).catch(() => null);
+        if (m) {
+          // compute indexURL as the directory containing pyodide.mjs
+          const idx = c.replace(/pyodide\.mjs(.*)?$/, '');
+          return { loadPyodide: m.loadPyodide, indexURL: idx };
+        }
+      }
+    }
+  } catch (err) {
+    // ignore and fall back to CDN
+  }
+
+  // 3) Fallback to CDN
   const CDN = 'https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.mjs';
   const m = await import(CDN);
   return { loadPyodide: m.loadPyodide, indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.3/full/' };
