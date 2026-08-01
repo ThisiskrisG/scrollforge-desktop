@@ -1,4 +1,3 @@
-```javascript
 // Runs as a module worker: new Worker(new URL('./pyodide-worker.js', import.meta.url), { type: 'module' })
 import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.mjs';
 
@@ -73,4 +72,3 @@ self.addEventListener('message', async (ev) => {
     self.postMessage({ id: msg?.id, type: 'error', error: String(err) });
   }
 });
-```

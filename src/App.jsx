@@ -1,4 +1,3 @@
-```javascript
 import React, { useEffect, useRef, useState } from 'react';
 import { loadMonaco } from './monaco-loader';
 
@@ -207,4 +206,3 @@ function escapeHtml(s) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
-```
