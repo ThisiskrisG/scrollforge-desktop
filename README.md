@@ -2,7 +2,7 @@
 
 A modern cross-platform desktop IDE featuring real Python execution via Pyodide (WebAssembly), live preview, and collaboration tools.
 
-![Scrollforge IDE](https://placehold.co/800x400/00bfff/ffffff?text=Scrollforge+IDE)
+![Scrollforge IDE](./docs/screenshot.png)
 
 ## Features
 
